@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "330067815135",
+    "firebase_url": "https://urpixpays-20124.firebaseio.com",
+    "project_id": "urpixpays-20124",
+    "storage_bucket": "urpixpays-20124.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330067815135:android:687f6b9bdc54f0dcc4576a",
+        "android_client_info": {
+          "package_name": "com.urpixpays"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330067815135-d5ic1gjut5k75d1u412g9fe7je35sphu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCI7F_qynmhj6z13VSVvfPRcced7lLpRPo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330067815135-d5ic1gjut5k75d1u412g9fe7je35sphu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "330067815135-3tsuuj7bjguo1po0q7k7pnoohvcglbbf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.urpixpay.UrpixPays"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
