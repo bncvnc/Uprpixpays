@@ -322,43 +322,46 @@ class ClosedChallenge extends Component {
                 </TouchableOpacity>
               </View>
             </ImageBackground>
-            <View style={styles.infoView}>
-                <View style={styles.InfoLeftView}>
-                  <View style={styles.textView}>
-                    <Text style={styles.leftTExt}>
-                     {item.item.votes}
-                    </Text>
-                  </View>
-                  <View>
-                  <Text style={styles.leftTextBottom}>
-                  Votes
-                  </Text>
-                  </View>
-                </View>
-                <TouchableWithoutFeedback
-                onPress={()=> this.placeDeletedHandler(item.item.id)}
-               
-               style={styles.infoMiddleView}>
-
-              <Text style={styles.text_ended}>Ended</Text>
-
-                </TouchableWithoutFeedback>
-                <View style={styles.infoRightView}>
-                <View>
-                    <Text style={styles.rightText}>
-                      {item.item.price}
-                    </Text>
-                  </View>
-                  <View>
-                  <Text style={styles.rightTextBottom}>
-                      Prices
-                  </Text>
-                  </View>
-                </View>
+            <View style={{backgroundColor:'#29ABE2',justifyContent:'center',alignItems:'center'}}>
+          <TouchableOpacity onPres={() =>{
+            this.placeDeletedHandler(item.item.id)
+          }} style={styles.InfoLeftView} >
+            <Text style={{fontSize:wp('6.6%'),paddingVertical:wp('2%'),color:'white'}}>
+              Ended
+            </Text>
+            </TouchableOpacity>
+  </View>
+  <View style={styles.infoView}>
+        
+            <View style={styles.infoMiddleView}>
+              <View>
+                <Text style={styles.leftTextBottom}>
+                Votes
+                </Text>
+              </View>
+              <View style={styles.textView}>
+                <Text style={styles.leftTExt}>
+                 {item.item.votes}
+                </Text>
+              </View>
+              
             </View>
-              <View style={styles.ImageOuline}>
-  
-             </View>
+
+            <View style={styles.infoRightView}>
+              <View>
+                <Text style={styles.rightTextBottom}>
+                    Cash Prize
+                </Text>
+              </View>
+              <View>
+                  <Text style={styles.rightText}>
+                    {item.item.price}
+                  </Text>
+              </View>
+             
+            </View>
+        </View>
+        <View style={styles.ImageOuline}></View>
             </View>
           )
         }}
@@ -534,22 +537,22 @@ const styles = StyleSheet.create({
     backgroundColor:'#29ABE2'
   },
   infoView:{
-    backgroundColor:'#333333',
+    backgroundColor:'#f1f1f1',
     width:'100%',
     flexDirection:'row',
-    justifyContent:'space-around',
-    height:wp('14%'),
+    height:wp('11%'),
     alignItems:'center',
     alignContent:'center',
-    alignSelf:'auto'
+
   },
   leftTExt:{
-    color:'white',
-    fontSize:wp('4.5%'),
+    color:'#000',
+    fontSize:wp('3.9%'),
   },
   leftTextBottom:{
-    color:'white',
-    fontSize:wp('4.7%'),
+    color:'#000',
+    fontWeight:'bold',
+    fontSize:wp('4%'),
   },
   textView:{
     justifyContent:"center",
@@ -560,10 +563,11 @@ const styles = StyleSheet.create({
   InfoLeftView:{
     justifyContent:"center",
     alignSelf:'auto',
+    flex:1,
     alignContent:'center',
     alignItems:'center',
-    paddingLeft:wp('5%'),
-    paddingRight:wp('5%'),
+    // paddingLeft:wp('3%'),
+    // paddingRight:wp('3%'),
   
   },
   infomiddleText:{
@@ -571,35 +575,39 @@ const styles = StyleSheet.create({
     color:"white",
     fontWeight:'600',
     fontFamily:'Roboto-Medium',
-   
 
   },
   rightText:{
-      fontSize:wp('4.3%'),
-      color:"white"
+      fontSize:wp('3.9%'),
+      color:"#000"
   },
   rightTextBottom:{
-    fontSize:wp('4.5%'),
-    color:'white'
+    fontSize:wp('4%'),
+    fontWeight:'bold',
+    color:'#000'
   },
   infoRightView:{
-    paddingLeft:wp('5%'),
+    
     justifyContent:"center",
+    flex:0.5,
     alignSelf:'auto',
     alignContent:'center',
     alignItems:'center'
   },
   infoMiddleView:{
-    paddingLeft:wp('7%'),
-    paddingRight:wp('7%'),
+    alignItems:'center',
+    justifyContent:'center',
     borderRightWidth:wp('.2'),
-    borderRightColor:'white',
-    borderLeftWidth:wp('.2'),
-    borderLeftColor:'white'
+    flex:0.5,
+    borderRightColor:'#29ABE2',
+    // borderLeftWidth:wp('.3'),
+    height:wp('5%'),
+    // borderLeftColor:'#29ABE2'
   },
   challengeOuterView:{
     // marginBottom:wp('1%')
   },
+
 
 container: {
   flex: 1,

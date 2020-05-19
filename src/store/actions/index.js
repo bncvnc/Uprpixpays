@@ -1,4 +1,4 @@
-export {resiterUser,logoutUser,loginUser,saveUserInfo,Verify,GoogleLogin,logoutUserr,socialSinup,socialSignIn} from './auth';
+export {resiterUser,logoutUser,loginUser,saveUserInfo,Verify,resiterUserThroughSocial,logoutUserr,socialSinup,socialSignIn} from './auth';
 export {Accept} from './Bid_request';
 export {uiStartLoading,uiStopLoading,SaveComponentId} from './ui';
 export {
@@ -35,5 +35,7 @@ export {
     GiveVoteAndMoveBAck,
     Add_Image_To_Like_List,
     ADD_IMAGE_TO_REPORT_LIST,
-    RefreshTaskData    
+    RefreshTaskData,
+    SaveUserInfoPayThroughInApp,
+    OnVotePressed    
 } from './pages';

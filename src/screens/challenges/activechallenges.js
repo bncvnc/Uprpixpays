@@ -43,7 +43,8 @@ import {
   uiStopLoading,
   uiStartLoading,
   RefreshTaskData,
-  getDetailsImage
+  getDetailsImage,
+  SaveUserInfoPayThroughInApp
  } from '../../store/actions/index';
 import Icons from 'react-native-vector-icons/Ionicons';
 import Topbar from '../../components/topbar/topbar';
@@ -63,6 +64,17 @@ import { connect } from 'react-redux';
 import { UploadImage } from '../../store/actions/index';
 import moment from 'moment';
 import FastImage from 'react-native-fast-image';
+import RNIap, {
+  InAppPurchase,
+  PurchaseError,
+  SubscriptionPurchase,
+  acknowledgePurchaseAndroid,
+  consumePurchaseAndroid,
+  finishTransaction,
+  finishTransactionIOS,
+  purchaseErrorListener,
+  purchaseUpdatedListener,
+} from 'react-native-iap';
 const { height } = Dimensions.get('window');
 const SI_SYMBOL = ["", "k", "M", "G", "T", "P", "E"];
 class ActiveChalenge extends Component {
@@ -236,7 +248,7 @@ class ActiveChalenge extends Component {
 
   flipChargeWand = (type, text) => {
 
-    this.props.Charge(type, text);
+    this.props.Charge(type, text,this.props.componentId);
     this.props.UserData();
 
 
@@ -657,7 +669,20 @@ class ActiveChalenge extends Component {
   //   });
   // };
 
-
+  requestPurchase = async (sku: string,first,second) => {
+      
+    try {
+    const show =  await RNIap.requestPurchase(sku, false);
+      console.log(show);
+      if(show){
+        this.props.SaveUserInfoPayThroughInApp(first,second)
+      }
+      
+    } catch (err) {
+      // alert(err);
+      console.log(err);
+    }
+  }
 
   onContentSizeChange = (contentWidth, contentHeight) => {
     // Save the content height in state
@@ -701,38 +726,78 @@ class ActiveChalenge extends Component {
         <View style={styles.lowerViewChargeModal}>
 
           {/* First View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(2, 1)}
+          <TouchableOpacity onPress={() =>{
+            if(Platform.OS==='android'){  
+              this.flipChargeWand(2, 2)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 2 Charges',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',2,2)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+            
+           
+          }}
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  1
+                  2
                       </Text>
               </View>
               <View>
                 <Text style={styles.chargePaymentValueRight}>
-                  Charge
+                  Charges
                       </Text>
               </View>
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 0.9
+                $ 0.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
           {/* Second View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(2, 5)}
+          <TouchableOpacity onPress={() =>{
+             if(Platform.OS==='android'){  
+              this.flipChargeWand(2, 9)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 9 Charges',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',2,9)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }}
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  5
+                  9
                       </Text>
               </View>
               <View>
@@ -743,22 +808,41 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 1.95
+                $ 3.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
           {/* Third View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(2, 10)}
+          <TouchableOpacity onPress={() => {
+             if(Platform.OS==='android'){  
+              this.flipChargeWand(2, 19)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 19 Charges',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',2,19)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }}
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  10
+                  19
                       </Text>
               </View>
               <View>
@@ -769,22 +853,41 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 3.50
+                $ 5.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
           {/* Fourth View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(2, 25)}
+          <TouchableOpacity onPress={() => {
+            if(Platform.OS==='android'){  
+              this.flipChargeWand(2, 39)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 39 Charges',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',2,39)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }}
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  25
+                  39
                       </Text>
               </View>
               <View>
@@ -795,14 +898,14 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 7.5
+                $ 9.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>)
@@ -817,39 +920,77 @@ class ActiveChalenge extends Component {
           <View style={styles.lowerViewChargeInner}>
             {/* First View */}
             <TouchableOpacity
-              onPress={() => this.flipChargeWand(1, 1)}
+              onPress={() =>{
+                if(Platform.OS==='android'){  
+                  this.flipChargeWand(1, 2)
+                }else{
+                  Alert.alert(
+                    'Pay',
+                    'Buy 2 Flips',
+                    [
+                      {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                      {
+                        text: 'Buy',
+                        onPress: () => {
+                          this.requestPurchase('wand5',1,2)
+                        },
+                      },
+                    ],
+                    {cancelable: false},
+                  );
+                }
+              }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    1
+                    2
                       </Text>
                 </View>
                 <View>
                   <Text style={styles.chargePaymentValueRight}>
-                    Flip
+                    Flips
                       </Text>
                 </View>
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 0.39
+                  $ 0.99
                   </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
             </TouchableOpacity>
           </View>
           {/* Second View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(1, 5)}
+          <TouchableOpacity onPress={() => {
+             if(Platform.OS==='android'){  
+              this.flipChargeWand(1, 9)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 9 Flips',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',1,9)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }}
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  5
+                  9
                       </Text>
               </View>
               <View>
@@ -860,22 +1001,41 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 1.75
+                $ 3.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
           {/* Third View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(1, 10)}
+          <TouchableOpacity onPress={() => {
+             if(Platform.OS==='android'){  
+              this.flipChargeWand(1, 19)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 19 Flips',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',1,19)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }}
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  10
+                  19
                       </Text>
               </View>
               <View>
@@ -886,23 +1046,42 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 3.20
+                $ 5.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
           {/* Fourth View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(1, 25)}
+          <TouchableOpacity onPress={() => {
+             if(Platform.OS==='android'){  
+              this.flipChargeWand(1, 39)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 39 Flips',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',1,39)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }}
 
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  25
+                  39
                       </Text>
               </View>
               <View>
@@ -913,14 +1092,14 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 7.25
+                $ 9.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>)
@@ -934,39 +1113,78 @@ class ActiveChalenge extends Component {
         <View style={styles.lowerViewChargeModal}>
           <View style={styles.lowerViewChargeInner}>
             {/* First View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(3, 1)}
+            <TouchableOpacity onPress={() => {
+              if(Platform.OS==='android'){  
+                this.flipChargeWand(3, 2)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 2 Wands',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',3,2)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    1
+                    2
                       </Text>
                 </View>
                 <View>
                   <Text style={styles.chargePaymentValueRight}>
-                    Wand
+                    Wands
                       </Text>
                 </View>
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 0.59
+                  $ 0.99
                   </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
             </TouchableOpacity>
           </View>
           {/* Second View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(3, 5)}
+          <TouchableOpacity onPress={() => {
+             if(Platform.OS==='android'){  
+              this.flipChargeWand(3, 9)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 9 Wands',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',3,9)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }
+          }
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  5
+                  9
                       </Text>
               </View>
               <View>
@@ -977,22 +1195,41 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 2.75
+                $ 3.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
           {/* Third View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(3, 10)}
+          <TouchableOpacity onPress={() => {
+             if(Platform.OS==='android'){  
+              this.flipChargeWand(3, 19)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 19 Wands',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',3,19)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }}
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  10
+                  19
                       </Text>
               </View>
               <View>
@@ -1003,22 +1240,41 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 5
+                $ 5.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
           {/* Fourth View */}
-          <TouchableOpacity onPress={() => this.flipChargeWand(3, 25)}
+          <TouchableOpacity onPress={() => {
+             if(Platform.OS==='android'){  
+              this.flipChargeWand(3, 39)
+            }else{
+              Alert.alert(
+                'Pay',
+                'Buy 39 Wands',
+                [
+                  {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                  {
+                    text: 'Buy',
+                    onPress: () => {
+                      this.requestPurchase('wand5',3,39)
+                    },
+                  },
+                ],
+                {cancelable: false},
+              );
+            }
+          }}
             style={styles.chargePayment}>
             <View style={styles.chargePaymentValue}>
               <View>
                 <Text style={styles.chargePaymentValueLeft}>
-                  25
+                  39
                       </Text>
               </View>
               <View>
@@ -1029,14 +1285,14 @@ class ActiveChalenge extends Component {
             </View>
             <View>
               <Text style={styles.chargePrice}>
-                $ 11.25
+                $ 9.99
                   </Text>
             </View>
-            <View>
-                <Text style={styles.chargePaymentValueRight}>
-                    Buy
-                    </Text>
-              </View>
+            <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+              <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
+                  Buy
+                  </Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>)
@@ -1127,7 +1383,11 @@ class ActiveChalenge extends Component {
               </TouchableOpacity>
               
                 
-              <TouchableOpacity style={styles.challengeBarFirstComponentOuter}>
+              <TouchableOpacity
+                onPress={() =>{
+                  this.changeScreen('UrPicsPay.BalanceOverView','Blannce Overview',2);
+                }}
+              style={styles.challengeBarFirstComponentOuter}>
                  <View style={[styles.challengeBarFirstComponent2,{width:wp('6%'),justifyContent:'center',alignContent:'center',alignItems:'center'}]}>
               <Image source={WalletImage} style={{ width: wp('5%'), height: wp('4%') }} />
               </View>
@@ -1182,7 +1442,7 @@ class ActiveChalenge extends Component {
                   </Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.challengeBarFirstComponentOuter}>
+              <TouchableOpacity style={[styles.challengeBarFirstComponentOuter,{width:wp('26%')}]}>
               <View style={styles.challengeBarFirstComponent1}>
                 <Text style={[styles.challengeBarFirstComponentText,{fontSize:wp('3%')}]}>
                   PIX ID: {this.props.user.no}
@@ -1343,7 +1603,7 @@ class ActiveChalenge extends Component {
                   timeLabelStyle={{ color: '#FFF', fontWeight: '500' }}
                   separatorStyle={{ color: '#FFF', fontSize: wp('6%'), marginBottom: wp('5%') }}
                   timeToShow={['D', 'H', 'M', 'S']}
-                  timeLabels={{ d:'Days', m: 'MINUTES', s: 'SECONDS', h: 'HOURS' }}
+                  timeLabels={{ d:'Days', m: 'Minutes', s: 'Seconds', h: 'Hour' }}
                   showSeparator
                 />
                 
@@ -1450,7 +1710,7 @@ class ActiveChalenge extends Component {
 
                 </View> */}
                 {/* Seventh View */}
-                <TouchableOpacity onPress={() => { this.changeScreen('UrPicsPay.TopPhotosView', 'Vote Images') }}
+                <TouchableOpacity onPress={() => { this.changeScreen('UrPicsPay.TopPhotosView', 'Vote') }}
                   style={styles.fifthBox}>
                   <Image source={vote} style={{ height: wp('7%'), width: wp('9%') }} />
                   <Text style={{ fontSize: wp('3%') }}>
@@ -1694,8 +1954,9 @@ resizeMode={FastImage.resizeMode.cover}
                   <Image source={flipicon} style={{ width: wp('15'), height: wp('15%') }} />
                 </TouchableOpacity>
 
-              </View></React.Fragment>:<React.Fragment><View style={styles.ImagesFlipbackground1}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: wp('0%') }}>
+              </View></React.Fragment>:<React.Fragment>
+                <View style={[styles.ImagesFlipbackground1,{height:wp('50%')}]}>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: wp('1%') }}>
 
                 <TouchableOpacity onPress={() => this.setState({
                 UploadImageNew: true,
@@ -1737,7 +1998,7 @@ resizeMode={FastImage.resizeMode.cover}
                 </View>
                 <TouchableOpacity onPress={() => this.setState({
                   flip: true
-                })} style={styles.thirdView1}>
+                })} style={[styles.thirdView1,{top:wp('30%')}]}>
                   <Image source={flipicon} style={{ width: wp('15'), height: wp('15%') }} />
                 </TouchableOpacity>
 
@@ -1751,13 +2012,13 @@ resizeMode={FastImage.resizeMode.cover}
                   <TouchableOpacity onPress={() => this.changeScreen('UrPicsPay.inviteChallange', 'Invite Challenges')}>
                   <LinearGradient colors={['#29ABE2', '#0099CC','#3B5998']}  style={{width:wp('45%'),height:wp('10%'),marginRight:wp('2%'),
                     justifyContent:'center',alignItems:'center',padding:5,elevation:5,borderRadius:3}}>
-                          <Text style={{fontSize:wp('4%'),fontWeight:'bold',color:'#fff'}}>Invite Friend</Text>
+                          <Text style={{fontSize:wp('4%'),fontWeight:'bold',color:'#fff'}}>Invite Friends</Text>
                     </LinearGradient>
                   </TouchableOpacity>
                     <TouchableOpacity onPress={() => this.changeScreen('UrPicsPay.Details', 'Details')}>
                     <LinearGradient  colors={['#5C4AE5', '#4432CC','#3F2B96']} style={{width:wp('45%'),height:wp('10%'),marginRight:wp('2%'),
                     justifyContent:'center',alignItems:'center',padding:5,elevation:5,borderRadius:3}}>
-                          <Text style={{fontSize:wp('4%'),fontWeight:'bold',color:'#fff'}}>Challenge Detail</Text>
+                          <Text style={{fontSize:wp('4%'),fontWeight:'bold',color:'#fff'}}>Challenge Details</Text>
                     </LinearGradient>
                     </TouchableOpacity>
                   
@@ -2131,7 +2392,7 @@ source={{
                           if(this.props.CurrentChallenge[0].image.image.length == this.props.CurrentChallenge[0].photocount){
                             Alert.alert(
                               'Alert',
-                              'Please Use Flip Now Your Max photos are already uploaded for this challenge',
+                              'You have reached maximum number of photo uploads for this Challenge. You may use the Flip option to change any  or all your photos.',
                               [
                                 {text: 'OK', onPress: () => console.log('OK Pressed')},
                               ],
@@ -2281,7 +2542,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom:wp('1.5%'),
     width: wp('12%'),
-    fontSize: wp('5%'),
+    fontSize: wp('4.5%'),
     marginLeft: wp('2%'),
     fontFamily: 'Raleway-Bold'
   },
@@ -2817,7 +3078,7 @@ const styles = StyleSheet.create({
     top: hp('30%'),
     left: 0,
     right: 0,
-    height: wp('55%'),
+    height: wp('60%'),
     justifyContent: 'center',
     alignContent: 'center',
     alignSelf: 'auto',
@@ -2891,7 +3152,7 @@ const styles = StyleSheet.create({
   },
   crossbutton: {
     position: 'absolute',
-    top: hp('65%'),
+    top: hp('75%'),
     left: wp('46.5%'),
   },
   container: {
@@ -2999,7 +3260,7 @@ const mapStatesToProps = state => {
 
 const mapsDispatchToProps = dispatch => {
   return {
-    Charge: (type, text) => dispatch(SaveUserInfoWallet(type, text)),
+    Charge: (type, text,componentId) => dispatch(SaveUserInfoWallet(type, text,componentId)),
     GetAllImages: () => (dispatch(GetVoteImages())),
     upload: (image, id,screen) => (dispatch(UploadImage(image, id,screen))),
     FlipImage:(image,id,imageId,screen)=>dispatch(FlipImage(image,id,imageId,screen)),
@@ -3009,6 +3270,7 @@ const mapsDispatchToProps = dispatch => {
     uiStartLoading:()=>dispatch(uiStartLoading()),
     RefreshTaskData:(cid)=>dispatch(RefreshTaskData(cid)),
     rankFucn: () => dispatch(getDetailsImage()),
+    SaveUserInfoPayThroughInApp:(type, text,componentId) =>dispatch(SaveUserInfoPayThroughInApp(type, text,componentId))
   }
 }
 

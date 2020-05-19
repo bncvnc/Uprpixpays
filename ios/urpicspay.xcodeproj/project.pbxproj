@@ -30,7 +30,7 @@
 		B8E9E62FDDE14A6BA36B72E5 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F6C823A7802A48B5A556F977 /* Entypo.ttf */; };
 		B99669B5115E48CA805E9BEE /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 15CEC58022F148E9945091DD /* FontAwesome5_Regular.ttf */; };
 		B9BBCC679CE146F7AE5BEFC0 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 57D4CCBF57EE426E86862CAE /* MaterialIcons.ttf */; };
-		BD376F46240A4A2A004A2993 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = BD376F45240A4A2A004A2993 /* main.jsbundle */; };
+		BD4FA80F246D249400757B61 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BD4FA80E246D249400757B61 /* GoogleService-Info.plist */; };
 		BD6E440B2407A145003B1E4A /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BD6E44062407A13E003B1E4A /* Roboto-Black.ttf */; };
 		BD6E440C2407A145003B1E4A /* Roboto-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BD6E44072407A13E003B1E4A /* Roboto-BlackItalic.ttf */; };
 		BD6E440D2407A145003B1E4A /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BD6E44042407A13E003B1E4A /* Roboto-Bold.ttf */; };
@@ -61,7 +61,8 @@
 		BD6E44262407A146003B1E4A /* Raleway-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BD6E43F62407A132003B1E4A /* Raleway-SemiBoldItalic.ttf */; };
 		BD6E44272407A146003B1E4A /* Raleway-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BD6E43EE2407A132003B1E4A /* Raleway-Thin.ttf */; };
 		BD6E44282407A146003B1E4A /* Raleway-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BD6E43F32407A132003B1E4A /* Raleway-ThinItalic.ttf */; };
-		BD6E442C2407A4AB003B1E4A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BD6E442B2407A4AA003B1E4A /* GoogleService-Info.plist */; };
+		BD89937C2463D79B00A6D864 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD89937B2463D79B00A6D864 /* StoreKit.framework */; };
+		BDDA787C245947160095106F /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = BDDA787B245947160095106F /* main.jsbundle */; };
 		BE6407E9B1D24034A0366E9E /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5AD0083F70534806A257C4B1 /* AntDesign.ttf */; };
 		CA2D8ABDB2F76861B04BBD8F /* libPods-urpicspay-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB5CF335582121FDB9D5311F /* libPods-urpicspay-tvOSTests.a */; };
 		D6486D51B0FD4872BF3B6B5C /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E0EC988B9FCD4F84A590DBCD /* Fontisto.ttf */; };
@@ -123,7 +124,7 @@
 		9AFE579FE55442D901D201C1 /* Pods-urpicspay-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-urpicspay-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-urpicspay-tvOS/Pods-urpicspay-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		AB5CF335582121FDB9D5311F /* libPods-urpicspay-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-urpicspay-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8D8CCEFA766CB376D317C4C /* libPods-urpicspayTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-urpicspayTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		BD376F45240A4A2A004A2993 /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
+		BD4FA80E246D249400757B61 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../src/apple keys/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BD6E43ED2407A132003B1E4A /* Raleway-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Raleway-ExtraBoldItalic.ttf"; path = "../../../../../Downloads/fonts/Raleway/Raleway-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
 		BD6E43EE2407A132003B1E4A /* Raleway-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Raleway-Thin.ttf"; path = "../../../../../Downloads/fonts/Raleway/Raleway-Thin.ttf"; sourceTree = "<group>"; };
 		BD6E43EF2407A132003B1E4A /* Raleway-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Raleway-SemiBold.ttf"; path = "../../../../../Downloads/fonts/Raleway/Raleway-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -154,7 +155,8 @@
 		BD6E44082407A13E003B1E4A /* Roboto-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto-Italic.ttf"; path = "../../../../../Downloads/fonts/Roboto/Roboto-Italic.ttf"; sourceTree = "<group>"; };
 		BD6E44092407A13E003B1E4A /* Roboto-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto-Light.ttf"; path = "../../../../../Downloads/fonts/Roboto/Roboto-Light.ttf"; sourceTree = "<group>"; };
 		BD6E440A2407A13F003B1E4A /* Roboto-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto-Medium.ttf"; path = "../../../../../Downloads/fonts/Roboto/Roboto-Medium.ttf"; sourceTree = "<group>"; };
-		BD6E442B2407A4AA003B1E4A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
+		BD89937B2463D79B00A6D864 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		BDDA787B245947160095106F /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		BE22BBECCF359A748CDAF345 /* libPods-urpicspay.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-urpicspay.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7302D5FDA1C4F8FB59B17C0 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		C92AE7B6633F4CCC92DF7E94 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				20011108A4D4E08A5A8D3208 /* libPods-urpicspay.a in Frameworks */,
+				BD89937C2463D79B00A6D864 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,11 +225,11 @@
 		13B07FAE1A68108700A75B9A /* urpicspay */ = {
 			isa = PBXGroup;
 			children = (
-				BD376F45240A4A2A004A2993 /* main.jsbundle */,
+				BDDA787B245947160095106F /* main.jsbundle */,
+				BD4FA80E246D249400757B61 /* GoogleService-Info.plist */,
 				F58C6F4D23FBE7B3008695E4 /* UrPixPays.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
-				BD6E442B2407A4AA003B1E4A /* GoogleService-Info.plist */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				F58C6F4F23FBEE58008695E4 /* LaunchScreen.xib */,
@@ -238,6 +241,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BD89937B2463D79B00A6D864 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				BE22BBECCF359A748CDAF345 /* libPods-urpicspay.a */,
@@ -530,9 +534,9 @@
 				87D0119CFFC9456AAFB2C973 /* Ionicons.ttf in Resources */,
 				BD6E44252407A146003B1E4A /* Raleway-SemiBold.ttf in Resources */,
 				4ADBE227D5204945B1818317 /* MaterialCommunityIcons.ttf in Resources */,
-				BD376F46240A4A2A004A2993 /* main.jsbundle in Resources */,
-				BD6E442C2407A4AB003B1E4A /* GoogleService-Info.plist in Resources */,
+				BDDA787C245947160095106F /* main.jsbundle in Resources */,
 				BD6E44132407A145003B1E4A /* Roboto-MediumItalic.ttf in Resources */,
+				BD4FA80F246D249400757B61 /* GoogleService-Info.plist in Resources */,
 				BD6E44152407A145003B1E4A /* Roboto-Thin.ttf in Resources */,
 				BD6E441F2407A145003B1E4A /* Raleway-Italic.ttf in Resources */,
 				BD6E44212407A145003B1E4A /* Raleway-LightItalic.ttf in Resources */,
@@ -587,7 +591,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		0EE5946A5BFBA2D5D28DC951 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -716,6 +720,7 @@
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/Stripe/Stripe.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -737,6 +742,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Stripe.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -889,12 +895,12 @@
 				CODE_SIGN_ENTITLEMENTS = urpicspay/UrPixPays.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 40;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = MLMXW75SD9;
 				INFOPLIST_FILE = urpicspay/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 18.0;
+				MARKETING_VERSION = 40.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -903,6 +909,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.urpixpay.UrpixPays;
 				PRODUCT_NAME = UrPixPays;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -915,11 +922,11 @@
 				CODE_SIGN_ENTITLEMENTS = urpicspay/UrPixPays.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = MLMXW75SD9;
 				INFOPLIST_FILE = urpicspay/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 18.0;
+				MARKETING_VERSION = 40.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -928,6 +935,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.urpixpay.UrpixPays;
 				PRODUCT_NAME = UrPixPays;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

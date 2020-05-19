@@ -74,6 +74,12 @@ class MyProfile extends React.Component {
             value: this.props.pro_data.age,
             valid:this.props.pro_data.age?this.props.pro_data.age.length > 0 ?true:false:false,
             touched:false
+          },
+          password: {
+            ...prevState.inputs.password,
+            value: this.props.pro_data.password,
+            valid:true,
+            touched:false
           }
         },
       };
@@ -226,11 +232,12 @@ onFieldTextChange = (text,field) => {
       "city":this.state.inputs.city.value,
       "country":this.state.inputs.country.value,
       "age":this.props.pro_data.age,
+      "password":this.state.inputs.password.value
   })
     .then((response) => {
       console.log(response.data.message);
       if(response.data.message =="profile update successfully") {
-        alert('Succesfully Updated Your Profile Data');
+        alert('Your profile was updated successfully!');
         this.props.UserData();
       }else{
         alert(response.data.data)
@@ -322,7 +329,7 @@ onFieldTextChange = (text,field) => {
          if(responseData.success){
             Alert.alert(
                'Alert',
-               'profile updated successfully',
+               'Your profile was updated successfully!',
                [
                  {text: 'OK', onPress: () => console.log('OK Pressed')},
                ],
@@ -370,7 +377,7 @@ onFieldTextChange = (text,field) => {
          if(responseData.success){
             Alert.alert(
                'Alert',
-               'Cover Photo updated successfully',
+               'Your profile was updated successfully!',
                [
                  {text: 'OK', onPress: () => console.log('OK Pressed')},
                ],
@@ -425,7 +432,12 @@ onFieldTextChange = (text,field) => {
           {LoginButton}
           <View style={styles.view_photo_parent}>
             <View style={styles.view_photo}>
-              <ImageBackground style={styles.view_img_bg} source={img1}>
+              <ImageBackground style={styles.view_img_bg}
+               source={this.props.pro_data.cover_img?{
+                uri:'https://urpixpays.com/public/images/profile_pictures/'+this.props.pro_data.cover_img
+              }:img1}
+              resizeMode={'cover'}
+              >
                 <View style={styles.view_overlay}>
                   <View style={styles.view_flexes}>
                     <View style={styles.view_flex_img}>
@@ -436,6 +448,7 @@ onFieldTextChange = (text,field) => {
                           <FastImage
                         style={styles.img_style}
                           source={{
+                            
                             uri:'https://urpixpays.com/public/images/profile_pictures/'+this.props.pro_data.images,
                               priority: FastImage.priority.high,
                           }}
@@ -520,7 +533,7 @@ onFieldTextChange = (text,field) => {
                   <Text style={{
                     fontSize: wp('3%'), fontWeight: '800', color: 'white',
                     letterSpacing: wp('-0.2%')
-                  }}>Register Date</Text>
+                  }}>Sing Up Date</Text>
                 </View>
               </View>
             </View>
@@ -595,7 +608,7 @@ onFieldTextChange = (text,field) => {
                   <Text style={{
                     fontSize: wp('3%'), fontWeight: '800', color: 'white',
                     letterSpacing: wp('-0.1%')
-                  }}>pix points</Text>
+                  }}>Pix Points</Text>
                 </View>
               </View>
             </View>
@@ -812,9 +825,17 @@ onFieldTextChange = (text,field) => {
               </View>
 
               <View style={[styles.view_date_view,{justifyContent:'center',alignContent:'flex-start',alignItems:'flex-start'}]}>
-                <Text style={{ fontWeight: '500', fontSize: wp('3%'), color: 'black' }}>
-                  ***************
-              </Text>
+              <TextInput
+                   onFocus={(event: Event) => {
+                    // `bind` the function if you're using ES6 classes
+                    this._scrollToInput(findNodeHandle(event.target))
+                  }}
+                  placeholderTextColor={'black'}
+                style={styles.textInputField}
+                placeholder={this.props.pro_data.password}
+                onChangeText={(text) => this.onFieldTextChange(text,'password')} 
+                value={this.state.inputs.password.value}
+                />
               </View>
 
             </View>
@@ -881,7 +902,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     height: wp('0.1%'),
     width: '100%',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'rgba(0,0,0,.1)',
   },
 
 
@@ -1050,8 +1071,8 @@ const styles = StyleSheet.create({
   },
   text_name:
   {
-    fontWeight: '500',
-    fontSize: wp('7%'),
+    fontWeight: 'bold',
+    fontSize: wp('4.5%'),
     letterSpacing: wp('0.5%'),
     color: 'white'
   },

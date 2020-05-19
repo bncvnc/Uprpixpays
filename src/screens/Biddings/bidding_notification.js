@@ -86,6 +86,13 @@ class Bidding extends React.Component {
           text: 'Pushed screen'
         },
         options: {
+          sideMenu: {
+            left: {
+                visible: false,
+                enabled: false,
+                
+              }
+        },
           topBar: {
             visible: false
           },
@@ -194,16 +201,17 @@ class Bidding extends React.Component {
                 <Text style={styles.text_view}>Bidding Notifications</Text>
               </TouchableOpacity>
               <View style={styles.view_line1}></View>
-              <TouchableOpacity onPress={() => this.ChangeCartNotification()}
+              {Platform.OS ==='android'?<TouchableOpacity onPress={() => this.ChangeCartNotification()}
                 style={[styles.item_view, { backgroundColor: this.state.cart ? '#8cc63f' : '#B5B5B5' }]}>
                 <Text style={styles.text_view}>Cart Notifications</Text>
-              </TouchableOpacity>
+              </TouchableOpacity>:<React.Fragment></React.Fragment>}
               <View style={styles.view_line1}></View>
 
               <TouchableOpacity onPress={() => this.ChangeSoldProducts()}
                 style={[styles.item_view, { backgroundColor: this.state.soldProducts ? '#8cc63f' : '#B5B5B5' }]}>
                 <Text style={styles.text_view}>Sold Products</Text>
               </TouchableOpacity>
+              <View style={styles.view_line1}></View>
               <TouchableOpacity onPress={() => this.ChangeInvitaion()}
                 style={[styles.item_view, { backgroundColor: this.state.invitation ? '#8cc63f' : '#B5B5B5' }]}>
                 <Text style={styles.text_view}>Invitation Table</Text>

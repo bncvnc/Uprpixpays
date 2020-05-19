@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.dooboolab.RNIap.RNIapPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 // import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -37,7 +38,8 @@ import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.react.NavigationReactNativeHost;
 import com.reactnativenavigation.react.ReactGateway;
-
+import com.gettipsi.stripe.StripeReactPackage;
+import com.dooboolab.RNIap.RNIapPackage;
 public class MainApplication extends NavigationApplication {
 
     @Override
@@ -75,7 +77,9 @@ public class MainApplication extends NavigationApplication {
                 new VectorIconsPackage(),
                 new RNFirebasePackage(),
                 new RNGoogleSigninPackage(),
-                new RNCWebViewPackage()
+                new RNCWebViewPackage(),
+                new StripeReactPackage(),
+                new RNIapPackage()
         );
     }
 

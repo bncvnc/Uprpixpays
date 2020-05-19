@@ -72,7 +72,7 @@ class BuyAndSell extends Component {
           // alert('Your Bid Has Been Submited');
           Alert.alert(
             'Bid Successful',
-            'Your Bid Has Been Submited',
+            'Your bid has been submitted successfully! You will be notified if the seller and the admin approve the bid.',
             [
               {text: 'OK', onPress: () => console.log('OK Pressed')},
             ],

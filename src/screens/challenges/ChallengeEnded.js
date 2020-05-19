@@ -83,7 +83,14 @@ class ChallangeEnded extends React.Component {
           }
         });
       }
-
+      getTimeLeft = (millisends) => {
+        return {
+          seconds: millisends % 60,
+          minutes: parseInt(millisends / 60, 10) % 60,
+          hours: parseInt(millisends / (60 * 60), 10) % 24,
+          days: parseInt(millisends / (60 * 60 * 24), 10),
+        };
+      };
   render() {
     // console.log(this.props.CurrentChallenge[0]);
     var today = new Date();
@@ -92,6 +99,16 @@ class ChallangeEnded extends React.Component {
     var diffMs = this.props.CurrentChallenge[0].start_time?moment(this.props.CurrentChallenge[0].start_time).diff(moment().format(), 'seconds'):0;
 
     let millisends = this.props.CurrentChallenge[0].timeline*60*60-diffMs;
+   let diff_in_hour =Math.floor( millisends/3600);
+  // console.log(this.getTimeLeft(millisends))  
+    // $create_at_difference=Carbon\Carbon::now()->diffInSeconds($c['start-time']);
+    // $diff_in_seconds = $c['timeline']*60*60-$create_at_difference;
+    // $diff_in_hour =floor( $diff_in_seconds/3600);
+    // echo $diff_in_hour.gmdate(":i:s", $diff_in_seconds);
+    // $c['timeline']
+
+    let TImeIneDays =this.getTimeLeft(millisends)
+    console.log(TImeIneDays);
     return (
       <View style={styles.conatainer}>
     <ScrollView>
@@ -145,7 +162,7 @@ class ChallangeEnded extends React.Component {
                 <View style={styles.BodyIconss}>
                     <View style={styles.IconsVotee}>
                         <Image style={styles.IconsVoteView} source={clocks} />
-                        <Text style={styles.IconsVoteViewTxttt}>{millisends}</Text>
+                  <Text style={styles.IconsVoteViewTxttt}>{TImeIneDays.days} Days:{TImeIneDays.hours} Hours:{TImeIneDays.minutes} Minuts</Text>
                         <View style={styles.ExpireBox}>
                             <Text style={styles.IconsVoteViewTxtttt}>Expired</Text>
                         </View>
@@ -328,7 +345,7 @@ const styles = StyleSheet.create({
   },
   IconsVoteViewTxttt:
   {
-    fontSize:wp('9%'),
+    fontSize:wp('3.4%'),
     marginLeft:wp('10%'),
     color:'#000'
   },
@@ -376,7 +393,7 @@ const styles = StyleSheet.create({
   {
       backgroundColor:'#cd2026',
       width:wp('20%'),
-      marginLeft:wp('9%'),
+      marginLeft:wp('5%'),
       borderRadius:5,
       alignContent:'center',
       alignItems:'center',

@@ -16,6 +16,7 @@ import {
   FlatList,
   findNodeHandle
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import {
     widthPercentageToDP as wp, 
     heightPercentageToDP as hp
@@ -30,22 +31,33 @@ import Icons from 'react-native-vector-icons/Ionicons';
 import {connect} from 'react-redux';
 import validate from '../../Validate/Validate';
 import {resiterUser} from '../../store/actions/index';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import DatePicker from 'react-native-datepicker'; 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import CountryPicker, { CountryModalProvider } from '../../coutryPicker/'
+import { CountryCode, Country } from '../../coutryPicker/types'
+import { Row } from '../../coutryPicker/Row';
+import { DARK_THEME } from '../../coutryPicker/CountryTheme'
 class SignUp extends Component {
 
   componentDidMount= () => {
     this.getMyValue();
+    this._GetCountriesData();
   }
 
 
     state={
+        CountriesData:[],
+        COutries:false,
+        date: new Date(),
         addDate:false,
+        ShowPrivacy:false,
         addMonth:false,
         addYear:false,
         addCountry:false,
         isLoggedIn: false,
+        DateSelected:'',
         user: {},
-
+        SelectCountry:false,
         inputs:{
           password:{
             value:'',
@@ -139,6 +151,20 @@ class SignUp extends Component {
           }
         }
     }
+
+_GetCountriesData =() =>{
+
+  fetch('https://urpixpays.com/stagging_urpixpays/countries')
+  .then((response)=>response.json())
+  .then((result) => {
+    console.log(result.data)
+    this.setState({
+      CountriesData:result.data
+    })
+  }).catch((err) => {
+    
+  });
+}
 
 
     getMyValue = async () => {
@@ -276,17 +302,19 @@ class SignUp extends Component {
 
           register = () => {
               //alert('Hellow');
-             let CHeckAge =this.getAge(this.state.inputs.month.value +'/'+this.state.inputs.day.value + '/' + this.state.inputs.year.value);
+             let CHeckAge =this.getAge(this.state.DateSelected.substring(5, 7) +'/'+this.state.DateSelected.substring(8, 10) + '/' + this.state.DateSelected.substring(0, 4));
+             console.log(CHeckAge);
              if(CHeckAge < 18) {
                alert('Your Age Does not qualify for our minimum age requirements');
                return;
              }
+
             let authdata = {
                     name:this.state.inputs.name.value,
                     email:this.state.inputs.email.value,
                     password:this.state.inputs.password.value,
                     mobile_number:this.state.inputs.myNumber.value,
-                    age:this.getAge(this.state.inputs.month.value +'/'+this.state.inputs.day.value + '/' + this.state.inputs.year.value),
+                    age:CHeckAge,
                     // age:this.state.inputs.month.value,
                     // age:this.state.inputs.year.value,
                     country:this.state.inputs.country.value,
@@ -336,9 +364,41 @@ class SignUp extends Component {
             // Add a 'scroll' ref to your ScrollView
             this.scroll.props.scrollToFocusedInput(reactNode)
           }
- 
+           onSelect = (country: Country) => {
+            console.log(country);
+            this.setState(prevState =>{
+      
+              return {
+                inputs: {
+                  ...prevState.inputs,
+                  country: {
+                    ...prevState.inputs.country,
+                    value: country.name,
+                    valid:true,
+                    touched:false
+                  }
+                },
+              };
+              
+            })
+          }
+        
   render ()
   {
+    const withFilter=true;
+    const withFlag = true;
+    const withCurrencyButton =true;
+    const withCallingCodeButton=true;
+    const withCountryNameButton = true;
+    const withAlphaFilter=true;
+    const withCallingCode =true;
+    const withCurrency=true;
+    const withEmoji=true;
+    const withModal=true;
+    const withFlagButton=true;
+    const disableNativeModal =false;
+
+  
         let day = [];
         let month = [];
         let year = [];
@@ -482,19 +542,19 @@ class SignUp extends Component {
             Age 
         </Text>
         </View>
-        <TouchableOpacity onPress={() => { this.setState({addDate:true})}} style={styles.textInputFOrdateRight}>
+        <TouchableOpacity onPress={() => { this.PickDate.onPressDate()}} style={styles.textInputFOrdateRight}>
         <Text style={[styles.textInputFieldDateRight,{paddingLeft:wp('6%')}]}>
-            {this.state.inputs.day.valid?this.state.inputs.day.value: 'Day'} <Icon name="sort-down" size={wp('7%')} color="#fff" />
+            {this.state.DateSelected?this.state.DateSelected.substring(8, 10): 'Day'} <Icon name="sort-down" size={wp('7%')} color="#fff" />
         </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { this.setState({addMonth:true})}} style={styles.textInputFOrdateRight}>
+        <TouchableOpacity onPress={() => { this.PickDate.onPressDate()}} style={styles.textInputFOrdateRight}>
         <Text style={styles.textInputFieldDateRight}>
-        {this.state.inputs.month.valid?this.state.inputs.month.value: 'Month'}  <Icon name="sort-down" size={wp('7%')} color="#fff" />
+        {this.state.DateSelected?this.state.DateSelected.substring(5, 7): 'Month'}  <Icon name="sort-down" size={wp('7%')} color="#fff" />
         </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { this.setState({addYear:true})}} style={styles.textInputFOrdateRight}>
+        <TouchableOpacity onPress={() => { this.PickDate.onPressDate()}} style={styles.textInputFOrdateRight}>
         <Text style={styles.textInputFieldDateRight}>
-        {this.state.inputs.year.valid?this.state.inputs.year.value: 'Year'}  <Icon name="sort-down" size={wp('7%')} color="#fff" />
+        {this.state.DateSelected?this.state.DateSelected.substring(0, 4): 'Year'}  <Icon name="sort-down" size={wp('7%')} color="#fff" />
         </Text>
         </TouchableOpacity>
         <View>
@@ -679,22 +739,68 @@ class SignUp extends Component {
             
            
         </Modal>
+
+        {/* Countries */}
+        <Modal visible={this.state.COutries} transparent={true} >
+            <View style={{
+                   paddingTop: hp('6%'),
+                   backgroundColor: '#rgba(255, 255, 255, 1)',
+                   width: '100%',
+                   height:'100%',
+                   paddingBottom: hp('6%'),
+            }}>
+            <Text style={{fontWeight:'bold',marginBottom:4,textAlign:'center',fontSize:wp('4%')}}>
+                Please Select Coutry
+            </Text>
+            {/* <View style={styles.pickerOuter}> */}
+            <FlatList
+                ref={x => this.flatlist = x}
+                data={this.state.CountriesData}
+                renderItem={({item}) => {
+                    // console.log(item);
+                return (
+                    <TouchableOpacity onPress={() =>{
+                      this.setState(prevState =>{
+      
+                        return {
+                          COutries:false,
+                          inputs: {
+                            ...prevState.inputs,
+                            country: {
+                              ...prevState.inputs.country,
+                              value: item,
+                              valid:true,
+                              touched:false
+                            }
+                          },
+                        };
+                        
+                      })
+                           
+                    }}   style={{paddingTop:4,paddingBottom:4,alignItems:'center'}}>
+                        <Text  style={{fontSize:wp('4%')}}  >{item}</Text>
+                    </TouchableOpacity>
+                )
+                }}
+                keyExtractor={({item})=>item}
+      />
+                    <TouchableOpacity onPress={() => { this.setState({COutries:false})}}  style={{paddingTop:4,paddingBottom:4,alignItems:'center'}}>
+                        <Text style={{fontWeight:'bold',marginBottom:4,textAlign:'center',fontSize:wp('4%')}}>Cancel</Text>
+                    </TouchableOpacity>
+            {/* </View> */}
+            </View>
+            
+           
+        </Modal>
         </View>
         </View>
-        <View onPress={() => { this.setState({addCountry:true})}} style={[styles.textInput,this.state.inputs.country.touched && !this.state.inputs.country.valid ?styles.invalid:'']}>
-        <TextInput 
-          onFocus={(event: Event) => {
-            // `bind` the function if you're using ES6 classes
-            this._scrollToInput(findNodeHandle(event.target))
-          }}
-        onChangeText={(text) => this.onFieldTextChange(text,'country')} 
-        placeholder={'Country'}
-        placeholderTextColor={'white'}
-        style={styles.textInputField}
-         />
+        <TouchableOpacity onPress={() => { this.setState({SelectCountry:true})}} style={[styles.textInput,this.state.inputs.country.touched && !this.state.inputs.country.valid ?styles.invalid:'']}>
+        <Text style={styles.textInputField}>
+          {this.state.inputs.country.value.length > 0?this.state.inputs.country.value:'Country'}
+        </Text>
         
         
-        </View>
+        </TouchableOpacity>
         <Text 
       style={[styles.warrnings,this.state.inputs.country.touched && !this.state.inputs.country.valid ?styles.show:styles.disapair]}
       >{this.state.inputs.country.warningText}</Text>
@@ -717,7 +823,17 @@ class SignUp extends Component {
 
                   {!this.props.loading ? <TouchableOpacity 
         disabled={email && password && confiormPassword && myNumber && City && country ? false : true}
-        onPress={()=>this.register()
+        onPress={()=>
+         { 
+          let CHeckAge =this.getAge(this.state.DateSelected.substring(5, 7) +'/'+this.state.DateSelected.substring(8, 10) + '/' + this.state.DateSelected.substring(0, 4));
+             if(CHeckAge < 18) {
+               alert('Your Age Does not qualify for our minimum age requirements our minimum age requirement is 18 ');
+               return;
+             } 
+          this.setState({
+            ShowPrivacy:true
+          })
+        }
         } 
         
         style={{flexDirection:'row'}}>
@@ -732,7 +848,84 @@ class SignUp extends Component {
         </TouchableOpacity>:<ActivityIndicator size={wp('15%')} color="#29abe2" />
 }
 
-       
+       {/* Privacy Policy  */}
+
+
+
+
+       <Modal 
+       visible={this.state.ShowPrivacy}
+        transparent={true}
+        onRequestClose={() =>{
+          this.setState({
+            ShowPrivacy:false
+          })
+        }}
+        >
+            <View style={{
+              flex:1,
+              zIndex:9999
+            }}>
+             <View style={{
+                      marginTop:wp('40%'),
+                      width:'100%',
+                      height:hp('70%')
+             }}>
+             <View 
+             style={{
+               width:'100%',
+               height:hp('50%')
+             }}>
+             <WebView
+                    source={{uri:'https://urpixpays.com/privacy'}}
+                      />
+             </View>
+             <View style={{
+               width:'100%',  
+              backgroundColor:'white',
+              flexDirection:'row',  
+              justifyContent:'space-between',
+              alignContent:'space-between',
+              alignItems:'center',
+              alignSelf:'auto',
+              paddingHorizontal:wp('5%')
+             }}>
+               <TouchableOpacity 
+               onPres={() =>{
+                 this.setState({
+                  ShowPrivacy:false
+                 })
+               }}
+               
+               style={{
+                 padding:wp('3%'),
+                backgroundColor:'#29abe2',
+               }}>
+                 <Text style={{fontSize:wp('3.5%'),color:'#fff'}}>
+                   Decline
+                 </Text>
+               </TouchableOpacity>
+               <TouchableOpacity onPress={() =>{
+                    this.register() 
+                    this.setState({
+                      ShowPrivacy:false
+                    })
+               }} style={{
+                 padding:wp('3%'),
+                 backgroundColor:'#29abe2',
+               }}>
+                 <Text style={{fontSize:wp('3.5%'),color:'#fff'}}>
+                   Accept
+                 </Text>
+               </TouchableOpacity>
+             </View>
+             </View>
+            </View>
+        </Modal>
+
+
+
+       {/* End Privcy Policy */}
 
 
 
@@ -742,9 +935,72 @@ class SignUp extends Component {
         </View>
 
         </View>
-       
+       <View>
+       <CountryPicker
+          theme={{}}
+          onSelect={this.onSelect}
+          modalProps={{
+            visible:this.state.SelectCountry
+          }}
+          onClose={() =>{
+            this.setState({
+              SelectCountry:false
+            })
+          }}
+          onOpen={() =>{
+
+          }}
+          {...{
+            CountryCode,
+            withFilter,
+            excludeCountries: ['FR'],
+            withFlag,
+            withCurrencyButton,
+            withCallingCodeButton,
+            withCountryNameButton,
+            withAlphaFilter,
+            withCallingCode,
+            withCurrency,
+            withEmoji,
+            withModal,
+            withFlagButton,
+            disableNativeModal,
+            
+          }}
+        />
+       </View>
         </ScrollView>
         </KeyboardAwareScrollView>
+        <View style={{height:0}}>
+        <DatePicker
+        date={this.state.date}
+        ref={ref=>(this.PickDate = ref)}
+        mode="date"
+        hideText={true}
+        format="YYYY-MM-DD"
+        confirmBtnText="Confirm"
+        cancelBtnText="Cancel"
+        minuteInterval={10}
+        customStyles={{
+          dateIcon: {
+            display:'none'
+          },
+          dateInput: {
+            color:'black',
+            borderWidth:0
+          },
+          dateText:{
+            //fontSize:wp('4%'),
+            fontSize:wp('5.5%'),color:'black',fontWeight:'600'
+          }
+          // ... You can check the source to find the other keys.
+        }}
+        onDateChange={(date) => {this.setState({
+          DateSelected: date,
+          
+        })}}
+      />
+        </View>
       </ImageBackground>
     )
   }

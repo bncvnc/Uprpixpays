@@ -10,11 +10,13 @@ import {
   GiveVoteToImages,
   GiveVoteAndMoveBAck,
   Add_Image_To_Like_List,
-  ADD_IMAGE_TO_REPORT_LIST
+  ADD_IMAGE_TO_REPORT_LIST,
+  OnVotePressed
 } from '../../store/actions/index'
-import VoteImage from  '../../images/vote-01.png';
+import VoteImage from  '../../images/voteSubmited.png';
 import Icon_out from 'react-native-vector-icons/FontAwesome5';
 import Icon from 'react-native-vector-icons/EvilIcons';
+import Icon_out2 from 'react-native-vector-icons/FontAwesome';
 import Ioncin from 'react-native-vector-icons/Ionicons';
 import {
   widthPercentageToDP as wp,
@@ -59,6 +61,7 @@ class TopPhotosView extends React.Component {
     // this.props.GetAllImages();
   }
   onCategoryClick = (id) =>{
+    this.props.OnVotePressed(id);
     this.state.selectedItems.filter((e) =>{
       console.log(e);
     })
@@ -132,6 +135,49 @@ this.setState({
   ShowVoteButton:true
 })
   }
+
+
+  gotoScreen = (screen,extraDAta) =>{
+      
+    Navigation.push(this.props.componentId, {
+        component: {
+          name: screen,
+          passProps: {
+            ...extraDAta
+          },
+          options: {
+            sideMenu: {
+              left: {
+                  visible: false,
+                  enabled: false
+                }
+          },
+          bottomTabs:{
+            visible:false,
+            drawBehind:true,
+            animate:true
+          },
+            topBar: {
+              visible:true,
+              background:{
+                color:'black'
+              },
+              backButton:{
+                color:"white",
+                title:''
+              }
+            },
+            animations: {
+              push: {
+                 waitForRender: true
+              }
+           }
+          }
+        }
+      });
+      
+}
+
   RenderVoteImage =({ item, index }) =>{
             
             let field ='Height'+index;
@@ -144,18 +190,19 @@ this.setState({
               onPress={()=>{
                 this.onCategoryClick(item.id,index);
                 this.props.add_voting_to_Images(index);
+              
               }}
               
               style={styles.view_photo_1}>
             
                                            <ImageBackground  
-                                           style={styles.view_img_bg,{height:250,}} 
+                                           style={styles.view_img_bg,{height:(this.state[field]?this.state[field]:hp('20%'))}} 
                                            onLoad={
                                             (evt) => {
                                               // console.log(evt.nativeEvent);
                                               this.setState({
-                                                [field]:evt.nativeEvent.source.height,
-                                                [width]:evt.nativeEvent.source.width
+                                                [field]: Platform.OS ==='ios'? evt.nativeEvent.source.height:evt.nativeEvent.source.height / evt.nativeEvent.source.width * wp('100%'),
+                                                [width]:evt.nativeEvent.width
                                               })
                                             }
                                           }
@@ -164,15 +211,13 @@ this.setState({
                                            source={{uri: item.url}}
                                           // resizeMode={'cover'}
                                           // resizeMode={}
-                                          resizeMethod={'scale'}
+                                          // resizeMode={'contain'}
+                                          // resizeMethod={'auto'}
                                            >
 
                         {this.state[Loading]?
                         <View style={{justifyContent:'center',alignContent:'center',alignItems:'center',flex:1}}>
                         <ActivityIndicator animating={ this.state[Loading] } size={'large'} color={'#29ABE2'} />
-                        <Text>
-                          Loading Image ...
-                        </Text>
                         </View>
                         :<React.Fragment>
                         {
@@ -182,14 +227,14 @@ this.setState({
                               }} style={{ height:wp('10%'),width:wp('10%'), marginLeft: wp('1.9%') }}>
                               {/* <i class="far fa-heart"></i> */}
                {item.liked?
-               <Ioncin name="ios-heart" size={wp('10%')} color="#ffffff" />:<Icon name="heart" size={wp('10%')} color="#ffffff" />}
+               <Ioncin name="ios-heart" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" />:<Icon name="heart" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" />}
                </TouchableOpacity>:<TouchableOpacity onPress={()=>{
                                         this.onLikedCliced(item.id,index);
                                              this.props.Add_Image_To_Like_List(index);
                                            }} style={{height:wp('10%'),width:wp('10%'), marginLeft: wp('0.75%') }}>
                                            {/* <i class="far fa-heart"></i> */}
                             {item.liked?
-                            <Ioncin name="ios-heart" size={wp('10%')} color="#ffffff" />:<Icon name="heart" size={wp('10%')} color="#ffffff" />}
+                            <Ioncin name="ios-heart" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" />:<Icon name="heart" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" />}
                             </TouchableOpacity>
                             }
 
@@ -198,14 +243,22 @@ this.setState({
                                         <Ioncin onPress={()=>{
                                           this.onReportButtonClicked(item.id,index)
                                           this.props.ADD_IMAGE_TO_REPORT_LIST(index);
-                                        }} name='ios-help-circle' size={wp('10%')} color='#ffffff' />
+                                        }} name='ios-help-circle' size={wp('10%')} style={{fontWeight:'bold'}} color='#29ABE2' />
                                         </TouchableOpacity>:<TouchableOpacity style={{ height:wp('12%'),width:wp('12%'), marginLeft: wp('0.75%') ,zIndex:9129}} >
                                         <Icon onPress={()=>{
                                           this.onReportButtonClicked(item.id,index)
                                           this.props.ADD_IMAGE_TO_REPORT_LIST(index);
-                                        }} name="question" size={wp('10%')} color="#ffffff" light />
+                                        }} name="question" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" light />
                                         </TouchableOpacity>}
-
+                                          <TouchableOpacity onPress={() =>{
+                                            let ExtraDAta ={
+                                              AllImages:this.props.Images,
+                                              initialindex:index
+                                            }
+                                            this.gotoScreen('UrPicsPay.ShowImages',ExtraDAta)
+                                          }}  style={{ height:wp('10%'),width:wp('10%'),  marginLeft: wp('2%'),zIndex:9129 }}>
+                                          <Icon_out2  name="search-plus" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" light />
+                                          </TouchableOpacity>
                                         <View>
                                             {item.selected?<React.Fragment>
                     {item.selected?<Image  source={img1}  style={{height:wp('15%'),width:wp('15%')}} />:<React.Fragment></React.Fragment>}
@@ -224,7 +277,7 @@ this.setState({
   // } 
 
   render() {
-    console.log(this.state);
+    console.log(this.props.selectedItems);
     const items = [
         { name: 'TURQUOISE', code: '#1abc9c' }, { name: 'EMERALD', code: '#2ecc71' },
         { name: 'PETER RIVER', code: '#3498db' }, { name: 'AMETHYST', code: '#9b59b6' },
@@ -284,7 +337,7 @@ this.setState({
                <View > 
                <TouchableOpacity 
                onPress={() =>{
-                this.props.GiveVoteToImages(this.state.selectedItems,this.state.LikedItems,this.state.ReporetedItems)
+                this.props.GiveVoteToImages(this.props.selectedItems,this.state.LikedItems,this.state.ReporetedItems)
                 this.setState({
                   ShowVoteButton:false
                 })
@@ -318,7 +371,7 @@ this.setState({
                     borderColor:'white'
                     }}
                  onPress={() =>{
-                  this.props.GiveVotesAndMoveBack(this.state.selectedItems,this.state.LikedItems,this.state.ReporetedItems)
+                  this.props.GiveVotesAndMoveBack(this.props.selectedItems,this.state.LikedItems,this.state.ReporetedItems)
                    Navigation.pop(this.props.componentId);
                  }}
                  >
@@ -340,18 +393,12 @@ this.setState({
       {loader}
       {ShowVote}
         <FlatList
-          // itemDimension={wp('35%')}
           data={this.props.Images}
-          // spacing={0}
-          // style={styles.gridView}
-          // staticDimension={300}
-          // fixed
-          // spacing={20}
-          // numColumns={2}
           renderItem={this.RenderVoteImage}
+          keyExtractor={(item) =>item.id}
         />
 
-        {this.state.selectedItems.length >0 || this.state.LikedItems.length >0  || this.state.ReporetedItems.length >0?
+        {this.props.selectedItems.length >0 || this.state.LikedItems.length >0  || this.state.ReporetedItems.length >0?
           <TouchableOpacity onPress={()=>{this.submitVotes()}} style={{position:'absolute', borderRadius: 8, bottom: 30, right: 20, paddingLeft: 15, paddingRight: 15, paddingTop: 8, paddingBottom: 8, backgroundColor: '#29ABE2'}}>
             <Text style={{fontWeight: 'bold', fontSize: wp('5%'), color: 'white'}}>Submit</Text>
           </TouchableOpacity>:<React.Fragment></React.Fragment>
@@ -397,24 +444,11 @@ const styles = StyleSheet.create({
     borderRadius:5,
     borderColor:'white',
     marginTop:wp('1.5%'),
-    // height:wp('30%'),
-    // borderColor:'#000',
-    // borderRadius:2,
-    // borderWidth:1
   },
   view_number: {
-    // marginLeft: wp('35%'),
-    // marginTop: wp('0.5%'),
-    // height: wp('10%'),
-    // width: wp('10%'),
-    // padding: wp('1%'),
     zIndex:2,
-    // backgroundColor: '#ffffff',
     borderRadius: wp('0.5%'),
-    // justifyContent: 'center',
-    // alignSelf: 'auto',
-    // alignItems: 'center',
-    // alignContent: 'center',
+
   },
   view_img_bg: {
     width: '100%',
@@ -480,13 +514,15 @@ const mapsDispatchToProps = dispatch =>{
     GiveVoteToImages:(selectedVotes,likedList,resportsLists)=>(dispatch(GiveVoteToImages(selectedVotes,likedList,resportsLists))),
     GiveVotesAndMoveBack:(selectedVotes,likedList,resportsLists)=>(dispatch(GiveVoteAndMoveBAck(selectedVotes,likedList,resportsLists))),
     Add_Image_To_Like_List:(index)=>(dispatch(Add_Image_To_Like_List(index))),
-    ADD_IMAGE_TO_REPORT_LIST:(index)=>(dispatch(ADD_IMAGE_TO_REPORT_LIST(index)))
+    ADD_IMAGE_TO_REPORT_LIST:(index)=>(dispatch(ADD_IMAGE_TO_REPORT_LIST(index))),
+    OnVotePressed:(id) =>dispatch(OnVotePressed(id))
   }
 }
 const mapStateToProps = (state)=>{
   return{
     Images:state.BestImages.VoteImages,
-    isLoading:state.isLoading.isLoading
+    isLoading:state.isLoading.isLoading,
+    selectedItems:state.BestImages.selectedItems
   }
 }
 

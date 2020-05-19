@@ -13,7 +13,8 @@ import {
   TouchableOpacity,
   Modal,
   TouchableHighlight,
-  FlatList
+  FlatList,
+  Linking
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
@@ -27,15 +28,21 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import Icons from 'react-native-vector-icons/Ionicons';
 import validate from '../../Validate/Validate';
-import { loginUser,socialSinup,socialSignIn,saveUserInfo } from "../../store/actions/index";
+import { loginUser,socialSinup,socialSignIn,saveUserInfo,uiStartLoading } from "../../store/actions/index";
 import startTabs from '../../components/startTabs/startTabs';
 import {connect} from "react-redux";
 import appNavigation from '../../components/startTabs/navigations';
 import {KeyboardAvoidingView} from 'react-native';
 import { GoogleSignin, statusCodes } from '@react-native-community/google-signin';
 import { LoginManager, AccessToken, GraphRequest, GraphRequestManager } from "react-native-fbsdk";
-
+import appleAuth, {
+  AppleButton,
+  AppleAuthRequestOperation,
+  AppleAuthRequestScope,
+  AppleAuthCredentialState,
+} from '@invertase/react-native-apple-authentication';
 import SplashScreen from 'react-native-splash-screen';
+import firebase from 'react-native-firebase';
 class Login extends Component {
 constructor(props) {
   super(props);
@@ -43,6 +50,14 @@ constructor(props) {
 }
 componentDidMount() {
   this._configureGoogleSignIn();
+   // Build a channel
+   const channel = new firebase.notifications.Android.Channel('default', 'default', firebase.notifications.Android.Importance.Max)
+   .setDescription('My apps test channel');
+
+   // Create the channel
+   firebase.notifications().android.createChannel(channel);
+   this.checkPermission();
+   this.createNotificationListeners();
   SplashScreen.hide();
 }
     state = {
@@ -72,11 +87,19 @@ componentDidMount() {
     }
 
     _configureGoogleSignIn() {
-      GoogleSignin.configure({
-    
-         // client ID of type WEB for your server (needed to verify user ID and offline access)
-    
-      });
+      if(Platform.OS ==='android'){
+        GoogleSignin.configure({
+          webClientId:'330067815135-d5ic1gjut5k75d1u412g9fe7je35sphu.apps.googleusercontent.com'
+           // client ID of type WEB for your server (needed to verify user ID and offline access)
+      
+        });
+      }else{
+        GoogleSignin.configure({
+           // client ID of type WEB for your server (needed to verify user ID and offline access)
+      
+        });
+      }
+      
     }
     getMyValue = async () => {
       try {
@@ -105,7 +128,7 @@ componentDidMount() {
         this.setState({ userInfo });
           if(userInfo.user.email !==null)
           {
-          this.props.socialSignInn(userInfo.user.email,userInfo.user.name);
+          this.props.socialSignInn(userInfo.user.email,userInfo.user.name,this.props.componentId);
           }
           else{
           ToastAndroid.showWithGravityAndOffset(
@@ -118,6 +141,7 @@ componentDidMount() {
           }
       } catch (error) {
         console.log(error);
+        // alert(error);
         if (error.code === statusCodes.SIGN_IN_CANCELLED) {
           // user cancelled the login flow
         } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -164,7 +188,7 @@ componentDidMount() {
       fetch('https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token=' + token)
       .then((response) => response.json())
       .then((json) => {
-        this.props.socialSignInn(json.email,json.name);
+        this.props.socialSignInn(json.email,json.name,this.props.componentId);
       })
     }
 
@@ -232,6 +256,94 @@ componentDidMount() {
         
       })
     }
+
+    //Firebase Notifications code
+    getToken = async () => {
+      let fcmToken = await AsyncStorage.getItem('fcmToken');
+      console.log(fcmToken);
+      if (!fcmToken) {
+        fcmToken = await firebase.messaging().getToken();
+        if (fcmToken) {
+          await AsyncStorage.setItem('fcmToken', fcmToken);
+        }
+      }
+    };
+  
+    checkPermission = async () => {
+      const enabled = await firebase.messaging().hasPermission();
+      if (enabled) {
+        this.getToken();
+      } else {
+        this.requestPermission();
+      }
+    };
+  
+    requestPermission = async () => {
+      try {
+        await firebase.messaging().requestPermission();
+        this.getToken();
+      } catch (error) {
+        console.log('permission rejected');
+      }
+    };
+  
+
+    async createNotificationListeners() {
+      /*
+      * Triggered when a particular notification has been received in foreground
+      * */
+      this.notificationListener = firebase.notifications().onNotification((notification) => {
+          const { title, body } = notification;
+          this.showAlert(title, body);
+      });
+    
+      /*
+      * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+      * */
+      this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
+          const { title, body } = notificationOpen.notification;
+          this.showAlert(title, body);
+      });
+    
+      /*
+      * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+      * */
+      const notificationOpen = await firebase.notifications().getInitialNotification();
+      if (notificationOpen) {
+          const { title, body } = notificationOpen.notification;
+          this.showAlert(title, body);
+      }
+      /*
+      * Triggered for data only payload in foreground
+      * */
+      this.messageListener = firebase.messaging().onMessage((message) => {
+        //process data message
+        console.log(JSON.stringify(message));
+        alert(JSON.stringify(message));
+      });
+    }
+    
+  
+
+    showAlert(title, body) {
+      Alert.alert(
+        title, body,
+        [
+            { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ],
+        { cancelable: false },
+      );
+    }
+
+    componentWillUnmount() {
+      this.notificationListener();
+      this.notificationOpenedListener();
+    }
+
+
+    //End Here 
+
+
     SubmitData  = ()  => {
       let  loginData = {
         email : this.state.inputs.email.value,
@@ -244,11 +356,67 @@ componentDidMount() {
       Navigation.popToRoot(this.props.componentId);
     } 
 
+    terms = () => {
+      Linking.canOpenURL('https://urpixpays.com/term_conditions').then(supported => {
+        if (supported) {
+          Linking.openURL('https://urpixpays.com/term_conditions');
+        } else {
+          console.log("Don't know how to open URI: ");
+        }
+      });
+    }
+     onAppleButtonPress = async () => {
+       // performs login request
+          const appleAuthRequestResponse = await appleAuth.performRequest({
+            requestedOperation: AppleAuthRequestOperation.LOGIN,
+            requestedScopes: [AppleAuthRequestScope.EMAIL, AppleAuthRequestScope.FULL_NAME],
+          });
+
+          const {
+            user: newUser,
+            email,
+            fullName,
+            nonce,
+            identityToken,
+            realUserStatus /* etc */,
+          } = appleAuthRequestResponse;
+          if(email){
+            AsyncStorage.setItem('appEmail',email);
+            AsyncStorage.setItem('name',fullName.familyName +' ' +fullName.givenName);
+          }
+          
+          console.log(appleAuthRequestResponse);
+          // user = newUser;
+          // get current authentication state for user
+          const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+          // use credentialState response to ensure the user is authenticated
+          if (credentialState === AppleAuthCredentialState.AUTHORIZED) {
+            // user is authenticated
+            this.props.uiStartLoading()
+            this.LoginThroughApple();
+          }
+    }
+
+
+    LoginThroughApple = async () => {
+      try {
+        const value = await AsyncStorage.getItem('appEmail')
+        const token =await AsyncStorage.getItem('name');
+        console.log(token);
+        console.log(value);
+        this.props.socialSignInn(value,token,this.props.componentId);
+      } catch(e) {
+        // read error
+        console.log(e);
+        console.log(data);
+      }
+    }
   render ()
   {
 
     console.log(this.props.logindata)
-        let email= this.state.inputs.email.valid;
+        let email= this.state.inputs.email.value.length > 0;
         let password= this.state.inputs.password.valid;
         let day = [];
         let month = [];
@@ -292,7 +460,7 @@ componentDidMount() {
         <View style={styles.formInnerView}>
         <View style={[styles.textInput]}>
         <TextInput 
-        placeholder={'Enter Your PixId or Email'}
+        placeholder={'Enter Your Pix ID or Email'}
         placeholderTextColor={'white'}
         style={styles.textInputField}
         value={this.state.inputs.email.value} 
@@ -322,8 +490,15 @@ componentDidMount() {
       >{this.state.inputs.password.warningText}</Text>
 
           {!this.props.loading?
-        <TouchableOpacity disabled={password ? false : true} 
-        style={{flexDirection:'row'}} onPress={()=> this.SubmitData()}>
+        <TouchableOpacity
+        style={{flexDirection:'row'}} onPress={()=> {
+          if(email && password) {
+            this.SubmitData()
+          }else{
+            alert('Please Enter Your User ID and Password.');
+          }
+         
+          }}>
         <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1.2, y: 0 }} 
         colors={[ '#bbd9f1','#138ece','#0067a9']} 
         style={[styles.textInput,{justifyContent:'center',
@@ -340,7 +515,7 @@ componentDidMount() {
             >
        
         <Text style={styles.BootomTextLeft}>
-          New to app?
+          New to UrPixPays?
         </Text>
         <TouchableOpacity 
         onPress={()=>this.changeScreen('UrPicsPay.SignUp','Sign Up')}
@@ -355,7 +530,7 @@ componentDidMount() {
         onPress={()=>this.changeScreen('UrPicsPay.Forgot_Password','Forget Password')}
         style={styles.forgetPassword}>
         <Text style={styles.forgetPasswordText}>
-            Forget Password?
+            Forgot Password?
         </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={()=>this.loginWithFb()} style={[styles.textInput,{justifyContent:'center',
@@ -364,16 +539,45 @@ componentDidMount() {
                     Continue With Facebook
                 </Text>
         </TouchableOpacity>
+        
+        {Platform.OS==='ios'?
+        <View tyle={[styles.textInput,{justifyContent:'center',
+        alignItems:'center',alignSelf:'auto',alignContent:'center',backgroundColor:'#ED4335',marginTop:wp('1.5%')}]}>
+            <AppleButton
+                    buttonStyle={AppleButton.Style.WHITE}
+                    buttonType={AppleButton.Type.SIGN_IN}
+                    style={{
+                      width: wp('80%'),
+                      height: 45,
+                      // marginLeft:wp('20%')
+                    }}
+                    onPress={() => {this.onAppleButtonPress()}}
+                  />
+        </View>
+       :<React.Fragment></React.Fragment>}
         <TouchableOpacity onPress={()=>this.signIn()} style={[styles.textInput,{justifyContent:'center',
         alignItems:'center',alignSelf:'auto',alignContent:'center',backgroundColor:'#ED4335',marginTop:wp('1.5%')}]}>
                 <Text style={styles.text}>
                 Continue With Gmail
                 </Text>
         </TouchableOpacity>
+        
         </View>
+       
         </View>
         </KeyboardAvoidingView>
+        
         </ScrollView>
+        <View style={styles.termsAndConditions}>
+        <Text style={styles.termsLeftText}>
+          By Signing up you agree with our 
+        </Text>
+        <Text onPress={() =>{
+          this.terms()
+        }} style={styles.termsRightText} >
+          terms of service
+        </Text>
+        </View>
        {/* </View> */}
       </ImageBackground>
     )
@@ -527,6 +731,27 @@ BootomTextLeft:{
   fontWeight:'900',
   fontFamily:Platform.OS === 'android' ? 'Raleway-Light':'Raleway',
 },
+termsAndConditions:{
+  width:wp('70%'),
+  height:wp('5%'),
+  position:'absolute',
+  top:Platform.OS ==='ios'? hp('95%'):hp('85%'),
+  left:wp('7%'),
+  flexDirection:'row',
+
+
+},
+termsRightText:{
+  color:'#29ABE2',
+  fontSize:wp('4%'),
+  paddingLeft:wp('1%'),
+  fontFamily:Platform.OS === 'android' ? 'Raleway-Light':'Raleway-Light',
+},
+termsLeftText:{
+  color:'white',
+  fontSize:wp('4%'),
+  fontFamily:Platform.OS === 'android' ? 'Raleway-Light':'Raleway-Light',
+}
 });
 
 const mapStateToProps = (state) => 
@@ -540,9 +765,10 @@ const mapStateToProps = (state) =>
 const mapsDispatchToProps  = (dispatch) =>{
   return{
     LogInUser : (loginData,componentId) => dispatch(loginUser(loginData,componentId)),
-    socialSignInn:(email,name)=>dispatch(socialSignIn(email,name)),
+    socialSignInn:(email,name,id)=>dispatch(socialSignIn(email,name,id)),
     social :()=>dispatch(socialSinup()),
     checkIfThereIsdata: (data) => dispatch(saveUserInfo(data)),
+    uiStartLoading:() =>dispatch(uiStartLoading())
   }
 }
 

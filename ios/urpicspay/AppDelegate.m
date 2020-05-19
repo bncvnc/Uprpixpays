@@ -21,9 +21,11 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   [FIRApp configure];
-  [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+
   [RNFirebaseNotifications configure];
+  [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
   [application registerForRemoteNotifications];
+
   [[FBSDKApplicationDelegate sharedInstance] application:application
                            didFinishLaunchingWithOptions:launchOptions];
   NSURL *jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
@@ -55,37 +57,19 @@
   return handled;
 }
     
-  
-//- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
-//  {
-//    return [[FBSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
-//
-////    return [RNGoogleSignin application:application
-////                               openURL:url
-////                     sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
-////                            annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
-//  }
-//  - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
-//    sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-//
-//    return [RNGoogleSignin application:application
-//                               openURL:url
-//                     sourceApplication:sourceApplication
-//                            annotation:annotation
-//            ];
-//  }
-
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo
 fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler{
- [[RNFirebaseNotifications instance] didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
+  [[RNFirebaseNotifications instance] didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 }
+
 - (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
- [[RNFirebaseMessaging instance] didRegisterUserNotificationSettings:notificationSettings];
+  [[RNFirebaseMessaging instance] didRegisterUserNotificationSettings:notificationSettings];
 }
+
 -(void) userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
  
- [[RNFirebaseMessaging instance] didReceiveRemoteNotification:response.notification.request.content.userInfo];
- completionHandler();
+  [[RNFirebaseMessaging instance] didReceiveRemoteNotification:response.notification.request.content.userInfo];
+  completionHandler();
 }
 
 

@@ -26,6 +26,8 @@ import {
   Image,
   Text,
   StatusBar,
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import moment from 'moment';
 import { connect } from 'react-redux';
@@ -37,23 +39,82 @@ class Notification extends React.Component {
     super(props);
     this.props.notification();
   }
+  cleareNotifications = () =>{
+    this.setState({
+      loading:true
+    })
+    fetch('https://urpixpays.com/stagging_urpixpays/clearnotification', {
+      method:'POST',
+      headers: {
+      Accept:'application/json',
+      'Content-Type':'application/json',
+      },
+      body:JSON.stringify({
+        "uid":this.props.user.id,
+      }),
+  })
+  .then((response) =>response.json())
+  .then((responseData) =>{
+    this.setState({
+      loading:false
+    })
+    console.log(responseData);
+    this.props.notification();
+  }).catch((err) =>{
+    this.setState({
+      loading:false
+    })
+  })
+  }
+  state={
+    loading:false,
+  }
   render() {
-    console.log(this.props.user)
+    let loader = (
+      <React.Fragment>
+
+      </React.Fragment>
+    );
+      if(this.state.loading){
+        loader = (
+         <View style={{zIndex:999999,justifyContent:'center',alignItems:'center',alignContent:'center',backgroundColor:'rgba(0,0,0,.6)',position:'absolute',top:0,left: 0,right: 0, bottom: 0,flex: 1}}>
+            <ActivityIndicator size={'large'} color='#29ABE2'  />
+         </View>
+        )
+      }
+
     return (
       <View style={styles.conatainer}>
 
+{loader}
+<View style={[{justifyContent:'flex-end',alignContent:'flex-end',flexDirection:'row',alignItems:'flex-end',alignSelf:'auto'}]}>
+         <TouchableOpacity 
+         onPress={() =>{
+          this.cleareNotifications();
+         }}
+         style={{backgroundColor:'#29ABE2',padding:wp('2%'),borderRadius:wp('1%'),marginRight:wp('1%')}}> 
+         <Text
+            style={{
+              // marginTop: wp('5%'),
+              // marginRight: wp('5%'),
+              fontSize: wp('3%'),
+              color:'white'
+            }}>
+            Clear Notifications
+          </Text>
+         </TouchableOpacity>
 
-       
+        </View>
 
         <View style={styles.text_earlier}>
-          <Text
+          {/* <Text
             style={{
               // marginTop: wp('5%'),
               marginLeft: wp('5%'),
               fontSize: wp('2.5%'),
             }}>
             NEW
-          </Text>
+          </Text> */}
 
         </View>
 
@@ -68,10 +129,12 @@ class Notification extends React.Component {
 
                 <View style={styles.view_parent}>
                   <View style={styles.view_list}>
-  
-                    <View style={styles.view_img_list}>
-                      <Image style={styles.image} source={image} />
+                    <View style={{height:wp('10%'),width:wp('4%')}}> 
+
                     </View>
+                    {/* <View style={styles.view_img_list}>
+                      <Image style={styles.image} source={image} />
+                    </View> */}
   
                     <View style={styles.view_name_list}>
                       <Text style={{ fontWeight: '600', color: 'black', fontSize: wp('2.5%') }}>
@@ -96,62 +159,9 @@ class Notification extends React.Component {
             
           }}
         />
-        <View style={styles.text_earlier}>
-          <Text
-            style={{
-              // marginTop: wp('5%'),
-              marginLeft: wp('5%'),
-              fontSize: wp('2.5%'),
-            }}>
-            EARLIER
-          </Text>
 
-        </View>
 
-        <FlatList
-          data={this.props.notice}
 
-          renderItem={({ item, index }) => {
-
-            
-
-            if(item.state == "earlier")
-            {
-              return (
-
-                <View style={styles.view_parent}>
-                  <View style={styles.view_list}>
-  
-                    <View style={styles.view_img_list}>
-                      <Image style={styles.image} source={image} />
-                    </View>
-  
-                    <View style={styles.view_name_list}>
-                      <Text style={{ fontWeight: '200', color: 'rgba(0, 0, 0, 0.6)', fontSize: wp('3%') }}>
-                        {/* View Your 
-                <Text style={{color: 'black',fontSize:wp('3.5%'),fontWeight:'500'}}> account details </Text>
-                here. You can deposit to or withdraw from Your Account. */}
-  
-                        {item.msg}
-                      </Text>
-                    </View>
-  
-                    <View style={styles.view_date_list}>
-                    <Text style={styles.time}>{moment(item.n_date).format('MM ddd YYYY, h:mm:ss a')}</Text>
-                    </View>
-  
-                  </View>
-  
-                  <View style={styles.view_line}></View>
-  
-  
-                </View>
-  
-              )
-            }
-            
-          }}
-        />
 
 
 
@@ -229,8 +239,9 @@ const styles = StyleSheet.create({
   view_date_list: {
     justifyContent: 'flex-end',
     position: 'absolute',
-    top: 2,
+    // top: 2,
     right: 2,
+    bottom:2,
     alignSelf: 'auto',
     alignItems: 'flex-end',
     marginRight: wp('3%'),
@@ -270,7 +281,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    alignContent: 'center'
+    alignContent: 'center',
+    marginBottom:wp('1%')
   },
   text_earlier:
   {

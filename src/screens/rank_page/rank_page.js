@@ -41,13 +41,16 @@ class RankPage extends React.Component {
   RenderContentData = ({ item, index }) => {
     let colors = [,'#8CC63F','#1B1464', '#ED1E79', '#F7931E','#1B1464','#C1272D'];
     
-    index = index + 1
+     index = index + 1
     // console.log(item);
 
     // if(item.name.length > 10) item.name = item.name.substring(0,15);
-    if(item.register_date.length > 10) item.register_date = item.register_date.substring(0,10);
+    // if(item.user.register_date.length > 10) item.user.register_date = item.user.register_date.substring(0,10);
 
-
+    let profile = 'avatar.jpg';
+    if(item.user){
+      profile = item.user.profile_image;
+    }
     if(index% colors.length)
     {
       return (
@@ -59,14 +62,14 @@ class RankPage extends React.Component {
                 <View style={styles.view_flex_1}>
                   <View style={styles.view_person_pic}>
                     <Image style={styles.img_style}
-                     source={{uri:'https://urpixpays.com/public/images/profile_pictures/'+item.profile_image}} />
+                     source={{uri:'https://urpixpays.com/public/images/profile_pictures/'+profile}} />
                   </View>
                 </View>
 
                 <View style={styles.view_flex_2}>
                   <View style={styles.view_texes}>
-              <Text style={styles.text_name}>{item.name}</Text>
-              <Text style={styles.text_date}>{item.register_date}</Text>
+              <Text style={styles.text_name}>{item.user?item.user.name:'no name'}</Text>
+              <Text style={styles.text_date}>{item.user?item.user.register_date:'no user'}</Text>
                   </View>
                   <View style={{flexDirection: 'row'}}>
                     <View style={styles.view_votes}>
@@ -86,7 +89,7 @@ class RankPage extends React.Component {
                           color: '#ffffff',
                           marginLeft: wp('10%'),
                         }}>
-                       {item.rank}
+                       {index}
                       </Text>
                       <Text
                         style={{
@@ -109,10 +112,10 @@ class RankPage extends React.Component {
            borderBottomRightRadius:25,justifyContent:'center',alignItems:'center',width:wp('90%')
            }}>
               <FlatList
-              data={this.props.rank[0].images}
+              data={item.images}
               horizontal={true}
               renderItem={(data) =>{
-                if(data.item.u_id == item.u_id){
+                // if(data.item.u_id == item.u_id){
                 return (
                   <View style={{flex:0.3,flexDirection:'row',justifyContent:'center',alignSelf:'center'}}>
                   <View style={[styles.view_votes1],{flexDirection:'column'
@@ -147,14 +150,23 @@ class RankPage extends React.Component {
                   marginRight:wp('2%'),backgroundColor:'#fff'}} />
               </View>
                 );
-                }else{
-                  return;
-                }
+                // }else{
+                //   return;
+                // }
               }}
               keyExtractor={item => {
                 Math.random().toString();
               }}
               /> 
+              {item.images.length >0 ?<React.Fragment>
+
+              </React.Fragment>:
+              <View style={{padding:wp('6%')}}>
+                <Text style={{color:'white'}}>
+                  This user has not uploaded any picture yet
+                </Text>
+              </View>
+              }
             </LinearGradient>
         </View>
            )
@@ -168,14 +180,15 @@ class RankPage extends React.Component {
               <View style={styles.view_flex_1}>
                 <View style={styles.view_person_pic}>
                   <Image style={styles.img_style}
-                   source={{uri:'https://urpixpays.com/public/images/profile_pictures/'+item.profile_image}} />
+                   source={{uri:'https://urpixpays.com/public/images/profile_pictures/'+profile}} 
+                   />
                 </View>
               </View>
 
               <View style={styles.view_flex_2}>
                 <View style={styles.view_texes}>
-            <Text style={styles.text_name}>{item.name}</Text>
-            <Text style={styles.text_date}>{item.register_date}</Text>
+            <Text style={styles.text_name}>{item.user?item.user.name:'no user'}</Text>
+            <Text style={styles.text_date}>{item.user?item.user.register_date:'no date'}</Text>
                 </View>
                 <View style={{flexDirection: 'row'}}>
                   <View style={styles.view_votes}>
@@ -195,7 +208,7 @@ class RankPage extends React.Component {
                         color: '#ffffff',
                         marginLeft: wp('10%'),
                       }}>
-                     {item.rank}
+                     {index}
                     </Text>
                     <Text
                       style={{
@@ -217,10 +230,10 @@ class RankPage extends React.Component {
         <LinearGradient colors={['#29abe2', '#0099cc','#3b5998']} style={{marginBottom:wp('5%'),
          borderBottomRightRadius:wp('5%'),justifyContent:'center',alignItems:'center',width:wp('90%')}}>
             <FlatList
-            data={this.props.rank[0].images}
+            data={item.images}
             horizontal={true}
             renderItem={(data) =>{
-              if(data.item.u_id == item.u_id){
+              // if(data.item.u_id == item.u_id){
               return (
                 <View style={{flex:0.3,flexDirection:'row',}}>
                 <View style={[styles.view_votes1],{flexDirection:'column'
@@ -255,14 +268,23 @@ class RankPage extends React.Component {
                 marginRight:wp('2%'),backgroundColor:'#fff'}} />
             </View>
               );
-              }else{
-                return;
-              }
+              // }else{
+              //   return;
+              // }
             }}
             keyExtractor={item => {
               Math.random().toString();
             }}
             /> 
+            {item.images.length >0 ?<React.Fragment>
+
+</React.Fragment>:
+<View style={{padding:wp('6%')}}>
+  <Text style={{color:'white'}}>
+    This user has not uploaded any picture yet
+  </Text>
+</View>
+}
           </LinearGradient>
       </View>
            )
@@ -275,29 +297,11 @@ class RankPage extends React.Component {
     return (
       
       <View style={styles.conatainer}>
-        {/* <View style={styles.topbar_view}>
-          <Topbar />
-        </View> */}
 
-
- 
-        {/* <View style={styles.view_photo_parent}>
-          <View style={styles.view_photo}>
-            <ImageBackground style={styles.view_img_bg} source={{uri:'https://urpixpays.com/blog/uploads/17/2019-07/photographer_430619_1920.jpg'}}>
-              <View style={styles.view_overlay}></View>
-            </ImageBackground>
-          </View>
-        </View> */}
 
         <FlatList
-            // itemDimension={wp('40%')}
             data={this.props.rank.length ==1?this.props.rank[0].rank:this.props.rank}
 
-            // spacing={wp('1%')}
-            // style={styles.gridView}
-            // staticDimension={300}
-            // fixed
-            // spacing={20}
 
             renderItem={this.RenderContentData}
         keyExtractor={item => {

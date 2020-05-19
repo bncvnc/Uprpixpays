@@ -19,6 +19,7 @@ import React, { Fragment } from 'react';
 import { Navigation } from "react-native-navigation";
 import FastImage from 'react-native-fast-image';
 import DoubleClick  from 'react-native-double-tap'
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -38,7 +39,8 @@ import {
   Text,
   StatusBar,
   ActivityIndicator,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 
 import Topbar from './topbar';
@@ -52,12 +54,27 @@ class BuyAndSellView extends React.Component {
   constructor(props) {
     super(props);
     // this.props.buysellFuction('latest','');
-
+    Navigation.events().bindComponent(this);
     
   }
   // state={
   //   search:''
   // }
+  navigationButtonPressed({ buttonId }) {
+    if (buttonId === "openSideDrawer") {
+      (!this.isSideDrawerVisible) ? this.isSideDrawerVisible = true : this.isSideDrawerVisible = false
+      Navigation.mergeOptions(this.props.componentId, {
+       sideMenu: {
+         left: {
+           visible: true,
+         }
+       }
+     });
+    }
+  if (buttonId === "GoToCArt") {
+    this.changeScreen('UrPicsPay.CartNotifications','Cart');
+  }
+ }
   state ={
     fetching_from_server:false,
     pickImage: [],
@@ -116,7 +133,7 @@ class BuyAndSellView extends React.Component {
          if(responseData.state){
             Alert.alert(
                'Alert',
-               'Your Image was successfully uploaded to Buy & Sell page',
+               'Your Image was successfully uploaded to bidding page',
                [
                  {text: 'OK', onPress: () => console.log('OK Pressed')},
                ],
@@ -126,7 +143,7 @@ class BuyAndSellView extends React.Component {
          }else{
             Alert.alert(
                'Alert',
-               'Your Image was successfully uploaded to Buy & Sell page',
+               'Your Image was successfully uploaded to bidding page',
                [
                  {text: 'OK', onPress: () => console.log('OK Pressed')},
                ],
@@ -140,7 +157,9 @@ class BuyAndSellView extends React.Component {
         this.setState({loading: false});
          console.log(err)
       })
-      .done();
+      .done(() =>{
+        this.setState({loading: false});
+      });
 
 
     // this.props.upload(idImage, this.props.CurrentChallenge[0].id,this.props.componentId);
@@ -149,7 +168,7 @@ class BuyAndSellView extends React.Component {
     })
 
   }
-  changeScreen = (screen) => {
+  changeScreen = (screen,title) => {
     // AsyncStorage.setItem("screen", JSON.stringify(screen));
     Navigation.push(this.props.componentId, {
       component: {
@@ -162,7 +181,7 @@ class BuyAndSellView extends React.Component {
 
             visible: true,
             title: {
-              text: 'Details',
+              text: title,
               color: '#000000',
               alignment: 'center'
             },
@@ -204,6 +223,48 @@ class BuyAndSellView extends React.Component {
     console.log(value);
 
   }
+
+  gotoScreen = (screen,extraDAta) =>{
+      
+    Navigation.push(this.props.componentId, {
+        component: {
+          name: screen,
+          passProps: {
+            ...extraDAta
+          },
+          options: {
+            sideMenu: {
+              left: {
+                  visible: false,
+                  enabled: false
+                }
+          },
+          bottomTabs:{
+            visible:false,
+            drawBehind:true,
+            animate:true
+          },
+            topBar: {
+              visible:true,
+              background:{
+                color:'black'
+              },
+              backButton:{
+                color:"white",
+                title:''
+              }
+            },
+            animations: {
+              push: {
+                 waitForRender: true
+              }
+           }
+          }
+        }
+      });
+      
+}
+
 
   renderFooter=() => {
     return (
@@ -250,6 +311,7 @@ class BuyAndSellView extends React.Component {
                         let field ='Height'+index;
                         let width = 'Widht'+index
                         let Loading = 'Loading'+index;
+                        
 
     return (
       <View style={styles.view_pics}>
@@ -305,7 +367,16 @@ class BuyAndSellView extends React.Component {
 <ImageBackground 
 onLoadStart={() => { this.setState({ [Loading]: true })} }
 onLoadEnd={() => { this.setState({ [Loading]: false })} }
-style={[[styles.view_img_bg,{height:250}]]}
+onLoad={
+  (evt) => {
+    // console.log(evt.nativeEvent);
+    this.setState({
+      [field]: Platform.OS ==='ios'? evt.nativeEvent.source.height:evt.nativeEvent.source.height / evt.nativeEvent.source.width * wp('100%'),
+      [width]:evt.nativeEvent.source.width
+    })
+  }
+}
+style={[[styles.view_img_bg,{height:this.state[field]?this.state[field]:hp('20%')}]]}
                                  source={{    uri: item.url
                                 }}
                                 // resizeMode={'center'}
@@ -329,19 +400,27 @@ style={[[styles.view_img_bg,{height:250}]]}
 </View>
               <View style={styles.view_overlay1}>
                 <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-                  <View style={{ flex: 0.4, marginLeft: wp('0.75%') }}>
+                  <TouchableOpacity onPress={() =>{
+                let ExtraDAta ={
+                  AllImages:this.props.buysell,
+                  initialindex:index
+                }
+                this.gotoScreen('UrPicsPay.ShowProfileImages',ExtraDAta)
+                  }} style={{ flex: 0.4, marginLeft: wp('0.75%') }}>
                     <Icon_out name="search-plus" size={wp('8%')} color="#ffffff" />
-                    </View>
+                    </TouchableOpacity>
                   <View style={{
                     flex: 2, justifyContent: 'center', alignContent: 'center',
                     alignItems: 'center', marginTop: wp('0.5%'), marginBottom: wp('0.5%')
                   }}>
                   </View>
                   <TouchableOpacity onPress={() => {
-                        this.changeScreen('UrPicsPay.BuyAndSell')
+                        this.changeScreen('UrPicsPay.BuyAndSell','Details')
                         this.props.getFunc(item.id);
                       }} style={{ flex: 0.4 }}>
-                    <Icon_out name="shopping-cart" size={wp('8%')} color="#ffffff" />
+                        {Platform.OS ==='android'?<Arrow name="gavel" size={wp('8%')} color="#ffffff"  />:<Arrow name="gavel" size={wp('8%')} color="#ffffff"  />}
+                        
+                    
                   </TouchableOpacity>
                 </View>
               </View>
@@ -358,11 +437,17 @@ style={[[styles.view_img_bg,{height:250}]]}
       </View>
     )
   }
+  isCloseToTop({ layoutMeasurement, contentOffset, contentSize }) {
+    const paddingToTop = 40;
+    console.log('CamedINHere')
+    return contentSize.height - layoutMeasurement.height - paddingToTop <= contentOffset.y;
+  }  
+  
+  
 
   render() {
     
-    // console.log(this.props.buysell.sort)
-    console.log(this.props.paginationData)
+   
 
     let loader = (
       <React.Fragment>
@@ -401,7 +486,7 @@ style={[[styles.view_img_bg,{height:250}]]}
       { name: 'SILVER', code: '#bdc3c7' },
       { name: 'ASBESTOS', code: '#7f8c8d' },
     ];
-    console.log(this.props.buysell)
+    // console.log(this.props.buysell)
     return (
       <View style={styles.conatainer}>
         {/* <View style={styles.topbar_view}>
@@ -416,7 +501,17 @@ style={[[styles.view_img_bg,{height:250}]]}
         style={styles.backButton}>
                     <Icons name={'md-camera'} size={wp('8%')} color={'white'} />
                   </TouchableOpacity>
-  <ScrollView>
+  <ScrollView
+  bounces={false}
+  onScroll= {({ nativeEvent }) => {
+    if (this.isCloseToTop(nativeEvent)) {
+      // this.setState({refreshing: true});
+      this.props.AddMorePages()
+      console.log('camed in here')
+      // this.props.AddMorePages();
+    }
+  }}
+  >
 
   
         <View style={styles.view_serch_drop}>
@@ -453,14 +548,38 @@ style={[[styles.view_img_bg,{height:250}]]}
                       color: '#29ABE2',
                     }}
                     Icon={() => {
-                      return ( <View style={{justifyContent:'center',alignItems:'center'}}>
-                        <Arrow name="keyboard-arrow-down" style={{ marginTop:Platform.OS==='android'?wp('3%'):0}} size={wp('7%')} color="#999999" /></View>
-                        );
+                      return (
+                        <View
+                          style={{
+                            backgroundColor: 'transparent',
+                            borderTopWidth: 10,
+                            borderTopColor: 'gray',
+                            borderRightWidth: 10,
+                            borderRightColor: 'transparent',
+                            borderLeftWidth: 10,
+                            borderLeftColor: 'transparent',
+                            width: 0,
+                            height: 0,
+                            marginTop:Platform.OS ==='android'?wp('1.9%'):0
+                          }}
+                        />
+                      );
                     }}
 
                     
                       onValueChange={(value,search) => {
                         this.Run(value,search);
+                      }}
+                      style={{
+                        ...pickerSelectStyles,
+                        iconContainer: {
+                          top: 14,
+                          right: 10,
+                        },
+                        placeholder: {
+                          fontSize:wp('3%'),
+                          color: '#29ABE2',
+                        },
                       }}
                       // selectedValue={this.props.buysellFuction('latest','')}
                       items={[
@@ -484,14 +603,23 @@ style={[[styles.view_img_bg,{height:250}]]}
           // itemDimension={wp('40%')}
           data={this.props.buysell}
           // spacing={0}
-
+          // bounces={false}
           style={styles.gridView}
           // staticDimension={300}
           // fixed
           // spacing={20}
+          // onEndReached={() =>{
+          //   this.props.AddMorePages();
+          // }}
+
+
+        
+          // scrollEventThrottle={400}
+          onEndReachedThreshold={0.5}
           renderItem={this.renderItemForFlatList}
           keyExtractor={i => items.id}
-          ListFooterComponent={this.renderFooter.bind(this)}
+          initialNumToRender={5}
+          // ListFooterComponent={this.renderFooter.bind(this)}
         />
         </ScrollView>
       </View>
@@ -686,8 +814,8 @@ const styles = StyleSheet.create({
   },
   view_serch: {
     flexDirection: 'row',
-    borderWidth: wp('0.1%'),
-    borderColor: '#999999',
+    borderWidth: wp('0.3%'),
+    borderColor: '#000000',
     flex:0,
     width: '100%',
     justifyContent: 'center',
@@ -852,6 +980,28 @@ const styles = StyleSheet.create({
 
 });
 
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: wp('3%'),
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    fontSize: wp('3%'),
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+});
 const mapStateToProps = (state) => {
   return {
     buysell: state.BestImages.BuySelldata,

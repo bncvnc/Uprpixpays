@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import closed_Img from '../../images/MyChallege.png';
+import closed_Img from '../../images/MyChallenges.png';
 import {
   SafeAreaView,
   TouchableHighlight,
@@ -17,7 +17,10 @@ import {
   Modal,
   Alert,
   Dimensions,
-  ActivityIndicator
+  ActivityIndicator,
+  TouchableWithoutFeedback,
+  TouchableWithNativeFeedback,
+  ToastAndroid
 } from 'react-native';
 import WalletImage from '../../images/Waleeticon.png';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -25,7 +28,7 @@ import PixP from '../../images/pixP.png';
 import flipImage from '../../images/img.png';
 import flip from '../../images/icon/flip.png';
 import flipicon from '../../images/icon/flipicon1.jpg';
-import charges from '../../images/icon/chargess.png';
+import Votes from '../../images/Votes.png';
 import Charge from '../../images/icon/charge.png';
 import FlipWithoutBg from '../../images/icon/flip-without-bg.png';
 import wand from '../../images/icon/wand.png';
@@ -55,7 +58,8 @@ import {
   uiStartLoading,
   RefreshTaskData,
   BuySell,
-  GetNotification
+  GetNotification,
+  SaveUserInfoPayThroughInApp
 } from '../../store/actions/index';
 import logo from '../../images/logoooooooooo.png';
 import SideDrawer from '../sidedrawer/sidedrawer';
@@ -64,12 +68,33 @@ import firebase from 'react-native-firebase';
 import moment from 'moment';
 import FastImage from 'react-native-fast-image';
 import ImagePicker from 'react-native-image-picker';
+// in App Pourchase
+import RNIap, {
+  InAppPurchase,
+  PurchaseError,
+  SubscriptionPurchase,
+  acknowledgePurchaseAndroid,
+  consumePurchaseAndroid,
+  finishTransaction,
+  finishTransactionIOS,
+  purchaseErrorListener,
+  purchaseUpdatedListener,
+} from 'react-native-iap';
+
+const item = 'wand5'
+const itemSkus = Platform.select({
+  ios: [
+    'wand5'
+  ],
+  android: [
+    'wand5'
+  ]
+});
 const { height } = Dimensions.get('window');
 const SI_SYMBOL = ["", "k", "M", "G", "T", "P", "E"];
 const MULTIPLIER = 1.15
 const LONG_DURATION = 350 * MULTIPLIER
 const SHORT_DURATION = 190 * MULTIPLIER
-
 class Mychallenge extends Component {
   
 
@@ -318,10 +343,15 @@ class Mychallenge extends Component {
 
     flipChargeWand = (type, text) => {
 
-      this.props.Charge(type, text);
+      this.props.Charge(type, text,this.props.componentId);
       this.props.UserData();
   
   
+    }
+
+    flipChargeWandThroughAppPurchase =(type, text) =>{
+      this.props.SaveUserInfoPayThroughInApp(type, text,this.props.componentId)
+      this.props.UserData();
     }
 
 
@@ -409,7 +439,7 @@ class Mychallenge extends Component {
   
     }
     
-    componentDidMount(){
+   async componentDidMount(){
       // this.LoadImages();
       this.props.notification();
       this.props.buysellFuction('latest', '');
@@ -422,10 +452,67 @@ class Mychallenge extends Component {
       firebase.notifications().android.createChannel(channel);
       this.checkPermission();
       this.createNotificationListeners();
+      try {
+        let connection = await RNIap.initConnection();
+        if(connection){
+          const products: Product[] = await RNIap.getProducts(itemSkus);
+          this.setState({ products });
+        }
+       
+      } catch(err) {
+        console.warn(err); // standardized err.code and err.message available
+      }
     }
-    // componentWillUpdate = () =>{
-    //   this.props.GetOPenChallenge();
-    // }
+
+     purchaseUpdateSubscription = purchaseUpdatedListener(
+      async (purchase: InAppPurchase | SubscriptionPurchase) => {
+        const receipt = purchase.transactionReceipt;
+        if (receipt) {
+          try {
+            console.log(receipt);
+            // if (Platform.OS === 'ios') {
+            //   finishTransactionIOS(purchase.transactionId);
+            // } else if (Platform.OS === 'android') {
+            //   // If consumable (can be purchased again)
+            //   consumePurchaseAndroid(purchase.purchaseToken);
+            //   // If not consumable
+            //   acknowledgePurchaseAndroid(purchase.purchaseToken);
+            // }
+            const ackResult = await finishTransaction(purchase);
+          } catch (ackErr) {
+            console.warn('ackErr', ackErr);
+          }
+
+          this.setState({receipt}, () => this.goNext());
+        }
+      },
+    );
+
+
+    purchaseErrorSubscription = purchaseErrorListener(
+      (error: PurchaseError) => {
+        console.log('purchaseErrorListener', error);
+        // Alert.alert('purchase error', JSON.stringify(error));
+      },
+    );
+
+ goNext = (): void => {
+    // Alert.alert('Receipt', this.state.receipt);
+  };
+    requestPurchase = async (sku: string,first,second) => {
+      
+      try {
+      const show =  await RNIap.requestPurchase(sku, false);
+        console.log(show);
+        if(show){
+          this.props.SaveUserInfoPayThroughInApp(first,second)
+        }
+        
+      } catch (err) {
+        alert(err);
+        console.log(err);
+      }
+    }
 
     componentWillUnmount() {
       this.removeNotificationListeners();
@@ -682,7 +769,7 @@ class Mychallenge extends Component {
         if (responseData.message =='Charge Successful!') {
           alert(responseData.message);
           // dispatch(uiStopLoading());
-
+          this.props.UserData();
           this.props.MyChallenges()
           // Navigation.popToRoot(this.props.componentId);
           this.setState({
@@ -765,6 +852,8 @@ class Mychallenge extends Component {
       return (
 
         <View style={styles.challengeOuterView}>
+    
+
    <FastImage
       nativeID={`image${item.item.id}`}
      style={{width:wp('100%'),height:wp('56%'),resizeMode:'contain'}}
@@ -804,7 +893,7 @@ class Mychallenge extends Component {
                <View style={{justifyContent:'center',alignItems:'center',alignContent:'center'}}>
            <RNSpeedometer 
               value={item.item.wandexposure.wandexposure/2} 
-              size={wp('15%')} 
+              size={wp('10%')} 
               minValue= {0} 
               maxValue= {7}
               labelStyle={{display:'none'}}
@@ -819,8 +908,8 @@ class Mychallenge extends Component {
                style={
                 {
                 backgroundColor: '#29ABE2', 
-                width: 50, 
-                height: Platform.OS === 'ios' ? 20 : 20, 
+                width: wp('15%'), 
+                height: wp('7%'), 
                 marginTop: 5,
                 justifyContent:'center',
                 alignContent:'center',
@@ -843,7 +932,7 @@ class Mychallenge extends Component {
            <View style={{justifyContent:'center',alignItems:'center',alignContent:'center'}}>
            <RNSpeedometer 
               value={item.item.exposure.exposure/2} 
-              size={wp('15%')} 
+              size={wp('10%')} 
               minValue= {0} 
               maxValue= {7}
               labelStyle={{display:'none'}}
@@ -858,8 +947,8 @@ class Mychallenge extends Component {
                style={
                 {
                 backgroundColor: '#29ABE2', 
-                width: 60, 
-                height: Platform.OS === 'ios' ? 20 : 20, 
+                width: wp('15%'), 
+                height: wp('7%'), 
                 marginTop: 10,
                 justifyContent:'center',
                 alignContent:'center',
@@ -875,52 +964,53 @@ class Mychallenge extends Component {
                </View>
           </View>
   </FastImage>
-        {/* <View style={styles.ImageOuline}>
-
-        </View> */}
-        <View style={styles.infoView}>
-            <View style={styles.InfoLeftView}>
+  <View style={{backgroundColor:'#29ABE2',justifyContent:'center',alignItems:'center'}}>
+          <View style={styles.InfoLeftView} >
+            <CountDown 
+                size={wp('3%')}
+                until={millisends}
+                // onFinish={() => alert('Finished')}
+                digitStyle={{backgroundColor: '#fff',borderColor: '#fff',borderRadius:3,marginTop:wp('3%')}}
+                digitTxtStyle={{color: '#000',padding:0}}
+                timeLabelStyle={{color: '#fff', fontWeight: '500',fontSize:wp('3%')}}
+                separatorStyle={{color: '#fff',fontSize:wp('5%'),marginLeft:wp('2%'),marginRight:wp('2%'),marginBottom:wp('3.5%')}}
+                timeToShow={['D','H','M','S']}
+                timeLabels={{d:'Days',m:'Minutes',s:'Seconds',h:'Hours'}}
+                showSeparator
+              />
+            </View>
+  </View>
+  <View style={styles.infoView}>
+        
+            <View style={styles.infoMiddleView}>
+              <View>
+                <Text style={styles.leftTextBottom}>
+                Votes
+                </Text>
+              </View>
               <View style={styles.textView}>
                 <Text style={styles.leftTExt}>
                  {item.item.votes}
                 </Text>
               </View>
-              <View>
-              <Text style={styles.leftTextBottom}>
-              Votes
-              </Text>
-              </View>
+              
             </View>
-            <View style={styles.infoMiddleView}>
-            <CountDown
-                size={wp('3.5%')}
-                until={millisends}
-                // onFinish={() => alert('Finished')}
-                digitStyle={{backgroundColor: '#333333', borderWidth: 0, borderColor: '#1CC625',borderRadius:0}}
-                digitTxtStyle={{color: 'white',padding:0}}
-                timeLabelStyle={{color: '#FFF', fontWeight: '500',fontSize:wp('3%')}}
-                separatorStyle={{color: '#FFF',fontSize:wp('5%'),marginBottom:wp('5%')}}
-                timeToShow={['D', 'H', 'M', 'S']}
-                timeLabels={{d:'Days',m: 'Minutes', s: 'Seconds',h:'Hours'}}
-                showSeparator
-              />
-            </View>
+
             <View style={styles.infoRightView}>
-            <View>
-                <Text style={styles.rightText}>
-                  {item.item.price}
+              <View>
+                <Text style={styles.rightTextBottom}>
+                    Cash Prize
                 </Text>
               </View>
               <View>
-              <Text style={styles.rightTextBottom}>
-                  Cash Prize
-              </Text>
+                  <Text style={styles.rightText}>
+                    {item.item.price}
+                  </Text>
               </View>
+             
             </View>
         </View>
-        <View style={styles.ImageOuline}>
-
-</View>
+        <View style={styles.ImageOuline}></View>
         </View>
       )
     }
@@ -928,7 +1018,7 @@ class Mychallenge extends Component {
   render ()
   {
     
-    console.log('state = ',this.props);
+    console.log('state = ',this.state);
     let loader = (
       <React.Fragment>
 
@@ -953,38 +1043,88 @@ class Mychallenge extends Component {
           <View style={styles.lowerViewChargeModal}>
   
             {/* First View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(2, 1)}
+            <TouchableOpacity onPress={() =>{
+
+        // ToastAndroid.showWithGravityAndOffset(
+        //   'You have joined the challenge successfully.',
+        //   ToastAndroid.LONG,
+        //   ToastAndroid.BOTTOM,
+        //   25,
+        //   50,
+        // );
+
+        // return;
+              if(Platform.OS==='android'){  
+                this.flipChargeWand(2, 2)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 2 Charges',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',2,2)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+              
+             
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    1
+                    2
                         </Text>
                 </View>
                 <View>
                   <Text style={styles.chargePaymentValueRight}>
-                    Charge
+                    Charges
                         </Text>
                 </View>
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 0.9
+                  $ 0.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
             </TouchableOpacity>
             {/* Second View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(2, 5)}
+            <TouchableOpacity onPress={() =>{
+               if(Platform.OS==='android'){  
+                this.flipChargeWand(2, 9)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 9 Charges',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',2,9)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    5
+                    9
                         </Text>
                 </View>
                 <View>
@@ -995,22 +1135,41 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 1.95
+                  $ 3.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
             </TouchableOpacity>
             {/* Third View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(2, 10)}
+            <TouchableOpacity onPress={() => {
+               if(Platform.OS==='android'){  
+                this.flipChargeWand(2, 19)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 19 Charges',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',2,19)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    10
+                    19
                         </Text>
                 </View>
                 <View>
@@ -1021,22 +1180,41 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 3.50
+                  $ 5.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
             </TouchableOpacity>
             {/* Fourth View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(2, 25)}
+            <TouchableOpacity onPress={() => {
+              if(Platform.OS==='android'){  
+                this.flipChargeWand(2, 39)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 39 Charges',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',2,39)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    25
+                    39
                         </Text>
                 </View>
                 <View>
@@ -1047,11 +1225,11 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 7.5
+                  $ 9.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
@@ -1069,39 +1247,77 @@ class Mychallenge extends Component {
             <View style={styles.lowerViewChargeInner}>
               {/* First View */}
               <TouchableOpacity
-                onPress={() => this.flipChargeWand(1, 1)}
+                onPress={() =>{
+                  if(Platform.OS==='android'){  
+                    this.flipChargeWand(1, 2)
+                  }else{
+                    Alert.alert(
+                      'Pay',
+                      'Buy 2 Flips',
+                      [
+                        {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                        {
+                          text: 'Buy',
+                          onPress: () => {
+                            this.requestPurchase('wand5',1,2)
+                          },
+                        },
+                      ],
+                      {cancelable: false},
+                    );
+                  }
+                }}
                 style={styles.chargePayment}>
                 <View style={styles.chargePaymentValue}>
                   <View>
                     <Text style={styles.chargePaymentValueLeft}>
-                      1
+                      2
                         </Text>
                   </View>
                   <View>
                     <Text style={styles.chargePaymentValueRight}>
-                      Flip
+                      Flips
                         </Text>
                   </View>
                 </View>
                 <View>
                   <Text style={styles.chargePrice}>
-                    $ 0.39
+                    $ 0.99
                     </Text>
                 </View>
-                <View>
-                <Text style={styles.chargePaymentValueRight}>
+                <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
               </TouchableOpacity>
             </View>
             {/* Second View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(1, 5)}
+            <TouchableOpacity onPress={() => {
+               if(Platform.OS==='android'){  
+                this.flipChargeWand(1, 9)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 9 Flips',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',1,9)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    5
+                    9
                         </Text>
                 </View>
                 <View>
@@ -1112,22 +1328,41 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 1.75
+                  $ 3.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
             </TouchableOpacity>
             {/* Third View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(1, 10)}
+            <TouchableOpacity onPress={() => {
+               if(Platform.OS==='android'){  
+                this.flipChargeWand(1, 19)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 19 Flips',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',1,19)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    10
+                    19
                         </Text>
                 </View>
                 <View>
@@ -1138,23 +1373,42 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 3.20
+                  $ 5.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
             </TouchableOpacity>
             {/* Fourth View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(1, 25)}
+            <TouchableOpacity onPress={() => {
+               if(Platform.OS==='android'){  
+                this.flipChargeWand(1, 39)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 39 Flips',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',1,39)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
   
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    25
+                    39
                         </Text>
                 </View>
                 <View>
@@ -1165,11 +1419,11 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 7.25
+                  $ 9.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
@@ -1186,39 +1440,78 @@ class Mychallenge extends Component {
           <View style={styles.lowerViewChargeModal}>
             <View style={styles.lowerViewChargeInner}>
               {/* First View */}
-              <TouchableOpacity onPress={() => this.flipChargeWand(3, 1)}
+              <TouchableOpacity onPress={() => {
+                if(Platform.OS==='android'){  
+                  this.flipChargeWand(3, 2)
+                }else{
+                  Alert.alert(
+                    'Pay',
+                    'Buy 2 Wands',
+                    [
+                      {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                      {
+                        text: 'Buy',
+                        onPress: () => {
+                          this.requestPurchase('wand5',3,2)
+                        },
+                      },
+                    ],
+                    {cancelable: false},
+                  );
+                }
+              }}
                 style={styles.chargePayment}>
                 <View style={styles.chargePaymentValue}>
                   <View>
                     <Text style={styles.chargePaymentValueLeft}>
-                      1
+                      2
                         </Text>
                   </View>
                   <View>
                     <Text style={styles.chargePaymentValueRight}>
-                      Wand
+                      Wands
                         </Text>
                   </View>
                 </View>
                 <View>
                   <Text style={styles.chargePrice}>
-                    $ 0.59
+                    $ 0.99
                     </Text>
                 </View>
-                <View>
-                <Text style={styles.chargePaymentValueRight}>
+                <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
               </TouchableOpacity>
             </View>
             {/* Second View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(3, 5)}
+            <TouchableOpacity onPress={() => {
+               if(Platform.OS==='android'){  
+                this.flipChargeWand(3, 9)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 9 Wands',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',3,9)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }
+            }
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    5
+                    9
                         </Text>
                 </View>
                 <View>
@@ -1229,22 +1522,41 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 2.75
+                  $3.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
             </TouchableOpacity>
             {/* Third View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(3, 10)}
+            <TouchableOpacity onPress={() => {
+               if(Platform.OS==='android'){  
+                this.flipChargeWand(3, 19)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 19 Wands',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',3,19)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    10
+                    19
                         </Text>
                 </View>
                 <View>
@@ -1255,22 +1567,41 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 5
+                  $ 5.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
             </TouchableOpacity>
             {/* Fourth View */}
-            <TouchableOpacity onPress={() => this.flipChargeWand(3, 25)}
+            <TouchableOpacity onPress={() => {
+               if(Platform.OS==='android'){  
+                this.flipChargeWand(3, 39)
+              }else{
+                Alert.alert(
+                  'Pay',
+                  'Buy 39 Wands',
+                  [
+                    {text: 'Cancel', onPress: () => console.log('Ask me later pressed')},
+                    {
+                      text: 'Buy',
+                      onPress: () => {
+                        this.requestPurchase('wand5',3,39)
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+            }}
               style={styles.chargePayment}>
               <View style={styles.chargePaymentValue}>
                 <View>
                   <Text style={styles.chargePaymentValueLeft}>
-                    25
+                    39
                         </Text>
                 </View>
                 <View>
@@ -1281,11 +1612,11 @@ class Mychallenge extends Component {
               </View>
               <View>
                 <Text style={styles.chargePrice}>
-                  $ 11.25
+                  $ 9.99
                     </Text>
               </View>
-              <View>
-                <Text style={styles.chargePaymentValueRight}>
+              <View style={{backgroundColor:'#29ABE2',paddingHorizontal:5,paddingVertical:3}}>
+                <Text style={[styles.chargePaymentValueRight,{color:'white'}]}>
                     Buy
                     </Text>
               </View>
@@ -1367,7 +1698,12 @@ class Mychallenge extends Component {
                 </View>
               </TouchableOpacity>
               
-              <TouchableOpacity style={styles.challengeBarFirstComponentOuter}>
+              <TouchableOpacity 
+              
+              onPress={() =>{
+                this.changeScreen('UrPicsPay.BalanceOverView','Blannce Overview',2);
+              }}
+              style={styles.challengeBarFirstComponentOuter}>
                  <View style={[styles.challengeBarFirstComponent2,{width:wp('6%'),justifyContent:'center',alignContent:'center',alignItems:'center'}]}>
               <Image source={WalletImage} style={{ width: wp('5%'), height: wp('4%') }} />
               </View>
@@ -1422,7 +1758,7 @@ class Mychallenge extends Component {
                   </Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.challengeBarFirstComponentOuter}>
+              <TouchableOpacity style={[styles.challengeBarFirstComponentOuter,{width:wp('26%')}]}>
               <View style={styles.challengeBarFirstComponent1}>
                 <Text style={[styles.challengeBarFirstComponentText,{fontSize:wp('3%')}]}>
                   PIX ID: {this.props.user.no}
@@ -1434,6 +1770,7 @@ class Mychallenge extends Component {
             </View>
         </View>
 
+    
         <View style={{backgroundColor: 'gray', height: wp('10%'), flexDirection: 'row'}}>
           <TouchableOpacity onPress={() => this.setState({allcharge: true})} style={{flexDirection: 'row'}}>
             <View style={{backgroundColor: 'white', borderRadius: 5, height: wp('7%'),paddingLeft: wp('1%'), paddingRight: wp('1%'), marginTop: wp('1.5%'), marginLeft: wp('6%')}}>
@@ -1458,8 +1795,6 @@ class Mychallenge extends Component {
           </TouchableOpacity>
           
         </View>
-        
-        
       
 {this.props.Mychalleng.length > 0 ?<View style={styles.mainView2}>
       
@@ -1799,25 +2134,27 @@ const styles = StyleSheet.create({
   },
   ImageOuline:{
     width:'100%',
-    height:wp('1.8%'),
+    height:wp('0.7%'),
     backgroundColor:'#29ABE2'
   },
+
   infoView:{
-    backgroundColor:'#333333',
+    backgroundColor:'#f1f1f1',
     width:'100%',
     flexDirection:'row',
-    height:wp('14%'),
+    height:wp('11%'),
     alignItems:'center',
     alignContent:'center',
-    alignSelf:'auto'
+
   },
   leftTExt:{
-    color:'white',
-    fontSize:wp('4.5%'),
+    color:'#000',
+    fontSize:wp('3.9%'),
   },
   leftTextBottom:{
-    color:'white',
-    fontSize:wp('4.7%'),
+    color:'#000',
+    fontWeight:'bold',
+    fontSize:wp('4%'),
   },
   textView:{
     justifyContent:"center",
@@ -1828,7 +2165,7 @@ const styles = StyleSheet.create({
   InfoLeftView:{
     justifyContent:"center",
     alignSelf:'auto',
-    flex:0.5,
+    flex:1,
     alignContent:'center',
     alignItems:'center',
     // paddingLeft:wp('3%'),
@@ -1840,19 +2177,19 @@ const styles = StyleSheet.create({
     color:"white",
     fontWeight:'600',
     fontFamily:'Roboto-Medium',
-   
 
   },
   rightText:{
-      fontSize:wp('4.3%'),
-      color:"white"
+      fontSize:wp('3.9%'),
+      color:"#000"
   },
   rightTextBottom:{
-    fontSize:wp('4.5%'),
-    color:'white'
+    fontSize:wp('4%'),
+    fontWeight:'bold',
+    color:'#000'
   },
   infoRightView:{
-    // paddingLeft:wp('4%'),
+    
     justifyContent:"center",
     flex:0.5,
     alignSelf:'auto',
@@ -1860,13 +2197,14 @@ const styles = StyleSheet.create({
     alignItems:'center'
   },
   infoMiddleView:{
-    // paddingLeft:wp('4%'),
-    // paddingRight:wp('4%'),
+    alignItems:'center',
+    justifyContent:'center',
     borderRightWidth:wp('.2'),
-    flex:1,
-    borderRightColor:'white',
-    borderLeftWidth:wp('.2'),
-    borderLeftColor:'white'
+    flex:0.5,
+    borderRightColor:'#29ABE2',
+    // borderLeftWidth:wp('.3'),
+    height:wp('5%'),
+    // borderLeftColor:'#29ABE2'
   },
   challengeOuterView:{
     // marginBottom:wp('1%')
@@ -2064,7 +2402,7 @@ modal: {
     color: 'white',
     marginBottom:wp('1.5%'),
     width: wp('12%'),
-    fontSize: wp('5%'),
+    fontSize: wp('4.5%'),
     marginLeft: wp('2%'),
     fontFamily: 'Raleway-Bold'
   },
@@ -2641,7 +2979,7 @@ modal: {
     top: hp('30%'),
     left: 0,
     right: 0,
-    height: wp('55%'),
+    height: wp('60%'),
     justifyContent: 'center',
     alignContent: 'center',
     alignSelf: 'auto',
@@ -2715,7 +3053,7 @@ modal: {
   },
   crossbutton: {
     position: 'absolute',
-    top: hp('65%'),
+    top: hp('75%'),
     left: wp('46.5%'),
   },
   container: {
@@ -2816,7 +3154,7 @@ const mapStatesToProps = state =>{
 
 const mapsDispatchToProps = dispatch =>{
   return{
-    Charge: (type, text) => dispatch(SaveUserInfoWallet(type, text)),
+    Charge: (type, text,componentId) => dispatch(SaveUserInfoWallet(type, text,componentId)),
     GetOPenChallenge : () => dispatch(MyChallenges()),
     GotoChallenge:(challenge) =>dispatch(OpenjoinedChallenge(challenge)),
     SaveComponentId:(id)=>dispatch(SaveComponentId(id)),
@@ -2824,7 +3162,8 @@ const mapsDispatchToProps = dispatch =>{
     MyChallenges:()=>dispatch(MyChallenges()),
     RefreshTaskData:(cid)=>dispatch(RefreshTaskData(cid)),
     buysellFuction: (sort, search) => dispatch(BuySell(sort, search)),
-    notification: () => dispatch(GetNotification())
+    notification: () => dispatch(GetNotification()),
+    SaveUserInfoPayThroughInApp:(type, text,componentId) =>dispatch(SaveUserInfoPayThroughInApp(type, text,componentId))
   }
 }
 

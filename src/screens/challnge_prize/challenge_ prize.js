@@ -38,13 +38,13 @@ class ChallengePrice extends React.Component {
     super(props);
     this.state = {
       tableHead: ['Rank', 'Cash Prize', 'Awarding(%)', 'Flip','Wand','Charge'],
-      widthArr: [60, 100, 100, 70, 75, 80],
+      widthArr: [40, 70, 80, 60, 65, 65],
       tableData: [
-        ['1', '300', '100%', '0','0','0','0'],
-        ['2', '15', '5%', '0','0','0','0'],
-        ['3', '9', '3%', '0','0','0','0'],
-        ['4', '6', '2%', '0','0','0','0'],     
-        ['5', '3', '1%', '0','0','0','0'],     
+        ['1', this.props.CurrentChallenge[0].price.substring(1), '100%', '0','0','0','0'],
+        ['2', this.props.CurrentChallenge[0].price.substring(1)*0.05, '5%', '0','0','0','0'],
+        ['3', this.props.CurrentChallenge[0].price.substring(1)*0.03, '3%', '0','0','0','0'],
+        ['4', this.props.CurrentChallenge[0].price.substring(1)*0.02, '2%', '0','0','0','0'],     
+        ['5', this.props.CurrentChallenge[0].price.substring(1)*0.01, '1%', '0','0','0','0'],     
         ['6~10', '0', '0', '3','3','3','0'],     
         ['11~50', '0', '0', '2','2','2','0'],     
         ['51~100', '0', '0', '1','1','1','0'],     
@@ -52,6 +52,8 @@ class ChallengePrice extends React.Component {
     };
   }
   render() {
+    console.log(this.props.CurrentChallenge[0].price.substring(1));
+    
     const state = this.state;
     const tableData = [];
     for (let i = 0; i < 30; i += 1) {
@@ -85,12 +87,12 @@ class ChallengePrice extends React.Component {
         </View>
 
         <View style={styles.table_view}>
-        <ScrollView horizontal={true}>
+        <ScrollView scrollEnabled={false} horizontal={true}>
           <View>
             <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
               <Row data={state.tableHead} widthArr={state.widthArr} style={styles.header} textStyle={styles.texts}/>
             </Table>
-            <ScrollView style={styles.dataWrapper}>
+            <ScrollView scrollEnabled={false} style={styles.dataWrapper}>
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
                 {
                   this.state.tableData.map((rowData, index) => (
@@ -134,9 +136,18 @@ const styles = StyleSheet.create({
   },
   table_view: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
   header: { height: 50, backgroundColor: '#537791' },
-  text: { textAlign: 'center', fontWeight: 'bold' },
-  texts: { textAlign: 'center', fontWeight: 'bold',color:'#ffffff' },
+  text: { textAlign: 'center', fontWeight: 'bold',fontSize:wp('2.5%') },
+  texts: { textAlign: 'center', fontWeight: 'bold',color:'#ffffff',fontSize:wp('2.5%') },
   dataWrapper: { marginTop: -1 },
   row: { height: 40, backgroundColor: '#E7E6E1' }
 });
-export default connect(null,null) (ChallengePrice);
+const mapStatesToProps = state => {
+  return {
+    CurrentChallenge: state.BestImages.CurrentChallenge,
+    user: state.user.user,
+    pro_data: state.BestImages.SaveuserProfiledata,
+    logindata: state.user.user,
+    isLoading:state.isLoading.isLoading
+  }
+}
+export default connect(mapStatesToProps,null) (ChallengePrice);

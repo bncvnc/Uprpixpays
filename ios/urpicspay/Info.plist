@@ -27,7 +27,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb459380238317263</string>
+				<string>fb2612836132289917</string>
 			</array>
 		</dict>
 		<dict>
@@ -35,14 +35,14 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.107450459293-rgru9a793s1691jf4jjg3du3heb24gf4</string>
+				<string>com.googleusercontent.apps.46008707050-2g3kedpnjkle9cre3crtdetklata7udj</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
-	<string>459380238317263</string>
+	<string>2612836132289917</string>
 	<key>FacebookDisplayName</key>
 	<string>UrPicsPay</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
@@ -63,7 +63,7 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use your camera</string>
+	<string>$(PRODUCT_NAME) would like to access your camera and photo library to upload photos to buy/sell, challenges, and your profile.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -71,7 +71,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like to save photos to your photo gallery</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like access to your photo gallery</string>
+	<string>$(PRODUCT_NAME) would like to access your camera and photo library to upload photos to buy/sell, challenges, and your profile.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string></string>
@@ -108,6 +108,7 @@
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -119,6 +120,9 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>

@@ -16,6 +16,8 @@ import {
     widthPercentageToDP as wp, 
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+import IconsI from 'react-native-vector-icons/Ionicons';
+import IconsM from 'react-native-vector-icons/MaterialIcons';
 import userImage from '../../images/buysell1111.png';
 import one from '../../images/icon/2.png';
 import two from '../../images/icon/3.png';
@@ -40,7 +42,7 @@ import fifthen from '../../images/icon/a_icon/8.png';
 import tenth from '../../images/icon/a_icon/chan-menu/3.png';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import FastImage from 'react-native-fast-image';
 
 class SideDrawer extends Component {
   
@@ -54,7 +56,7 @@ constructor(props)
   // Navigation.events().bindComponent(this.props.componentId);
   Navigation.events().registerComponentDidAppearListener( ( { componentId } ) => {
     // only spy on tabs we don't need other screens
-    if (componentId === 'MyChallenges' || componentId === 'open' || componentId==='close' || componentId ==='past') {
+    if (componentId === 'MyChallenges' || componentId === 'open' || componentId==='close' || componentId ==='past' || componentId ==='Bidding') {
         this.setState({
             activeComponentId: componentId
         })
@@ -96,7 +98,7 @@ closeDrawer (){
   }
 
   gotoScreen = (screen,title) =>{
-      this.closeDrawer();
+      // this.closeDrawer();
     Navigation.push(this.state.activeComponentId, {
         component: {
           name: screen,
@@ -108,7 +110,8 @@ closeDrawer (){
             sideMenu: {
               left: {
                   visible: false,
-                  enabled: false
+                  enabled: false,
+                  
                 }
           },
            topBar:{
@@ -119,14 +122,61 @@ closeDrawer (){
            },
            
            bottomTabs:{
-             visible:false,
-             drawBehind:false,
-             animate:true,
-             height:0
-           }
+            visible:false,
+            drawBehind:true,
+            animate:true
+          },
           }
         }
       });
+     }
+     gotoBuyAndSell = (screen,title) =>{
+      // this.closeDrawer();
+      Promise.all([
+
+        IconsI.getImageSource(Platform.OS === 'android' ?'md-cart':'md-cart',30),
+        IconsM.getImageSource(Platform.OS === 'android' ?'md-cart':'gavel',30),
+        
+    ]).then(source =>{
+      Navigation.push(this.state.activeComponentId, {
+        component: {
+          name: screen,
+         
+          passProps: {
+            text: 'Pushed screen'
+          },
+          options: {
+            sideMenu: {
+              left: {
+                  visible: false,
+                  enabled: false,
+                  
+                }
+          },
+           topBar:{
+             title:{
+               text:title,
+               alignment:'center'
+             },
+             rightButtons:[{
+              id: 'GoToCArt',
+              icon:Platform.OS==='android'?source[0]:source[1],
+              color:'#000000',
+              // color:'#ffffff',
+            }]
+           },
+           
+           bottomTabs:{
+            visible:false,
+            drawBehind:true,
+            animate:true
+          },
+           
+          }
+        }
+      });
+    })
+ 
      }
     //  componentWillUpdate() {
     
@@ -144,8 +194,15 @@ closeDrawer (){
         <ScrollView  showsVerticalScrollIndicator={false}>
           <View style={styles.UserImageOuterView}>
             <View style={styles.UserImage}>
-                <Image style={styles.profile_image}
-                source={{uri:'https://urpixpays.com/public/images/profile_pictures/avatar.jpg'}}/>
+            <FastImage
+                        style={styles.profile_image}
+                          source={{
+                            
+                            uri:'https://urpixpays.com/public/images/profile_pictures/'+this.props.pro_data.images,
+                              priority: FastImage.priority.high,
+                          }}
+                          resizeMode={FastImage.resizeMode.cover}
+                      />
             </View>
             <View style={styles.UserStatus}>
                 <View style={{width:wp('3%'),height:wp('3%'),backgroundColor:'green',borderRadius:wp('1.45%')}}>
@@ -199,7 +256,7 @@ closeDrawer (){
           //         }
           //     }
           // });
-                this.gotoScreen('UrPicsPay.BuyAndSellView','Buy / Sell')
+                this.gotoBuyAndSell('UrPicsPay.BuyAndSellView','Buy / Sell')
             }} 
             style={styles.menuIconView}>
             <View style={styles.menuIcon}>
@@ -255,6 +312,17 @@ closeDrawer (){
             <View style={styles.MenuTextView}>
               <Text style={styles.MenuText}>
                 Best Images 
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            this.gotoScreen('UrPicsPay.PastChallenges','Past Challengs')}} style={styles.menuIconView}>
+            <View style={styles.menuIcon}>
+              <Image source={seven} style={{width:wp('15%'),height:wp('10%')}} />
+            </View>
+            <View style={styles.MenuTextView}>
+              <Text style={styles.MenuText}>
+                Past Challenges
               </Text>
             </View>
           </TouchableOpacity>
@@ -361,20 +429,24 @@ closeDrawer (){
             </View>
             <View style={styles.MenuTextView}>
               <Text style={styles.MenuText}>
-                Bidding Notification
+                Bidding Notifications
               </Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuIconView}>
-            <View style={styles.menuIcon}>
-              <Image source={thirten} style={{width:wp('15%'),height:wp('10%')}} />
-            </View>
-            <View style={styles.MenuTextView}>
-              <Text style={styles.MenuText}>
-                Cart Notification
-              </Text>
-            </View>
-          </TouchableOpacity>
+          {Platform.OS==='android'?
+        <TouchableOpacity style={styles.menuIconView}>
+        <View style={styles.menuIcon}>
+          <Image source={thirten} style={{width:wp('15%'),height:wp('10%')}} />
+        </View>
+        <View style={styles.MenuTextView}>
+          <Text style={styles.MenuText}>
+            Cart Notifications
+          </Text>
+        </View>
+      </TouchableOpacity>:<React.Fragment>
+        
+      </React.Fragment>  
+        }
           <TouchableOpacity onPress={() =>{
               this.gotoScreen('UrPicsPay.Notification','Notifications')
           }} style={styles.menuIconView}>
@@ -384,6 +456,30 @@ closeDrawer (){
             <View style={styles.MenuTextView}>
               <Text style={styles.MenuText}>
                 Notifications
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() =>{
+              this.gotoScreen('UrPicsPay.Products_Purchased','Products Purchased')
+          }} style={styles.menuIconView}>
+            <View style={styles.menuIcon}>
+              <Image source={thirten} style={{width:wp('15%'),height:wp('10%')}} />
+            </View>
+            <View style={styles.MenuTextView}>
+              <Text style={styles.MenuText}>
+                Products Purchased
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() =>{
+              this.gotoScreen('UrPicsPay.UrTrasaction','Transactions')
+          }} style={styles.menuIconView}>
+            <View style={styles.menuIcon}>
+              <Image source={thirten} style={{width:wp('15%'),height:wp('10%')}} />
+            </View>
+            <View style={styles.MenuTextView}>
+              <Text style={styles.MenuText}>
+                My Transactions
               </Text>
             </View>
           </TouchableOpacity>
@@ -555,6 +651,7 @@ const mapStateToProps = (state) =>{
   return{
     id:state.isLoading.id,
     pro_data:state.BestImages.SaveuserProfiledata,
+    
     data:state.user.user
   }
 }

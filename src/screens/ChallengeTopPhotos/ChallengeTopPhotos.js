@@ -40,7 +40,7 @@ import {
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation';
 
-class ChallengeTopPhotos extends React.Component {
+class ChallengeTopPhotos extends React.PureComponent {
   constructor(props){
     super(props);
 
@@ -133,7 +133,47 @@ this.setState({
   ShowVoteButton:true
 })
   }
-  
+  gotoScreen = (screen,extraDAta) =>{
+      
+    Navigation.push(this.props.componentId, {
+        component: {
+          name: screen,
+          passProps: {
+            ...extraDAta
+          },
+          options: {
+            sideMenu: {
+              left: {
+                  visible: false,
+                  enabled: false
+                }
+          },
+          bottomTabs:{
+            visible:false,
+            drawBehind:true,
+            animate:true
+          },
+            topBar: {
+              visible:true,
+              background:{
+                color:'black'
+              },
+              backButton:{
+                color:"white",
+                title:''
+              }
+            },
+            animations: {
+              push: {
+                 waitForRender: true
+              }
+           }
+          }
+        }
+      });
+      
+}
+
 
   // componentWillUnmount = () =>{
   //   let data =[];
@@ -143,9 +183,16 @@ this.setState({
 
     RenderContenct =({ item, index }) =>{
       let Loading = 'Loading'+index;
+  
     return (
 
-      <View style={styles.view_photo_1}>
+      <TouchableOpacity onPress={() =>{
+        let ExtraDAta ={
+          AllImages:this.props.rank.length ==1?this.props.rank[0].images:this.props.rank,
+          initialindex:index
+        }
+        this.gotoScreen('UrPicsPay.ShowProfileImages',ExtraDAta)
+      }} style={styles.view_photo_1}>
         <ImageBackground style={styles.view_img_bg} source={{
           uri: item.url
         }}
@@ -154,9 +201,6 @@ this.setState({
           >
             { this.state[Loading]?<View style={{justifyContent:'center',alignContent:'center',alignItems:'center',flex:1}}>
               <ActivityIndicator animating={ this.state[Loading] } size={'large'} color={'#29ABE2'} />
-              <Text>
-                Loading Image ...
-              </Text>
               </View>:<React.Fragment>
               <View style={styles.view_overlay}>
           <View style={{ marginLeft: wp('0.75%') }}>
@@ -174,13 +218,13 @@ this.setState({
                 </React.Fragment>}
           
         </ImageBackground>
-      </View>
+      </TouchableOpacity>
 
     )
   }
 
   render() {
-    console.log(this.state);
+    // console.log(this.state);
     const items = [
         { name: 'TURQUOISE', code: '#1abc9c' }, { name: 'EMERALD', code: '#2ecc71' },
         { name: 'PETER RIVER', code: '#3498db' }, { name: 'AMETHYST', code: '#9b59b6' },

@@ -55,16 +55,20 @@ target 'urpicspay' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
-  pod 'Firebase/Core', '~> 6.13.0'
+#  pod 'Firebase/Core', '~> 6.13.0'
+#
+#  pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
+#
+#  pod 'Firebase/Messaging', '~> 6.13.0'
 
-  pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
-
-  pod 'Firebase/Messaging', '~> 6.13.0'
-
-
+  pod 'Firebase'
+  pod 'Firebase/Messaging'
+  pod 'Firebase/Core', '~> 6.2.0'
 
 
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
+  pod 'RNIap', :path => '../node_modules/react-native-iap'
 
   target 'urpicspayTests' do
     inherit! :search_paths

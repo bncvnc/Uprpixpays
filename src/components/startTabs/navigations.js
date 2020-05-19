@@ -5,6 +5,10 @@ import Icons from 'react-native-vector-icons/FontAwesome';
 import IconsI from 'react-native-vector-icons/Ionicons';
 import IconsM from 'react-native-vector-icons/MaterialIcons';
 import { Platform } from 'react-native';
+import {
+  widthPercentageToDP as wp, 
+  heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
 const appNavigation =()=>
 {
   if(Platform.OS === 'android'){
@@ -17,6 +21,8 @@ const appNavigation =()=>
       IconsM.getImageSource(Platform.OS === 'android'? "menu": "menu",30),
       Icons.getImageSource(Platform.OS ==='android' ? "arrow-back" :"ios-menu",30),
       IconsI.getImageSource(Platform.OS === 'android' ?'md-notifications-outline':'md-notifications-outline',30),
+      IconsM.getImageSource(Platform.OS === 'android' ?'gavel':'gavel',30),
+      IconsI.getImageSource(Platform.OS === 'android' ?'md-person':'md-person',30),
   ]).then(sources => {
     Navigation.setRoot({
       root: {
@@ -194,7 +200,7 @@ const appNavigation =()=>
                   stack: {
                     children: [{
                       component:{
-                        name:'UrPicsPay.PastChallenges',
+                        name:'UrPicsPay.UrPortfolio',
                         id:'past',
 
                         options: {
@@ -205,7 +211,7 @@ const appNavigation =()=>
                            
 
                             title: {
-                              text: 'Past Challanges',
+                              text: 'Portfolio',
                               color:'#000000',
                               alignment: 'center'                              
                             },
@@ -228,8 +234,52 @@ const appNavigation =()=>
                       bottomTab: {
                         borderColor: 'red',
                         borderHeight: 1.3,
-                        text: 'Past',
-                        icon:sources[2],
+                        text: 'Portfolio',
+                        icon:sources[7],
+                        iconColor: 'lightgrey',
+                        selectedIconColor: '#29abe2',
+                        textColor: 'lightgrey',
+                        selectedTextColor: '#29abe2',
+                        fontFamily: 'ProximaNova-Bold',
+                        fontSize:10
+                      }
+                    }
+                  }
+                }, 
+                {
+                  stack: {
+                    children: [{
+                      component:{
+                        name:'UrPicsPay.BuyAndSellView',
+                        id:'Bidding',
+
+                        options: {
+                          topBar: {
+                            background: {
+                              color: '#ffffff'
+                            },
+                           
+
+                            title: {
+                              text: 'Bidding',
+                              color:'#000000',
+                              alignment: 'center'                              
+                            },
+                            leftButtons: [{
+                              id: 'openSideDrawer',
+                              icon:sources[3],
+                              color:'#000000',
+                            }],
+                          }
+                        }
+                      }
+                    }],
+                    options: { 
+                      bottomTab: {
+                        borderColor: 'red',
+                        borderHeight: 1.3,
+                        text: 'Bidding',
+                        icon:sources[6],
                         iconColor: 'lightgrey',
                         selectedIconColor: '#29abe2',
                         textColor: 'lightgrey',
@@ -257,12 +307,22 @@ const appNavigation =()=>
       IconsM.getImageSource(Platform.OS === 'android'? "menu": "menu",30),
       Icons.getImageSource(Platform.OS ==='android' ? "arrow-back" :"ios-menu",30),
       IconsI.getImageSource(Platform.OS === 'android' ?'md-notifications-outline':'md-notifications-outline',30),
+      IconsM.getImageSource(Platform.OS === 'android' ?'gavel':'gavel',30),
+      IconsI.getImageSource(Platform.OS === 'android' ?'ios-person':'ios-person',30),
   ]).then(sources => {
     Navigation.setRoot({
       root: {
          
         sideMenu: {
           id: "sideMenu",
+          options: {
+            sideMenu: {
+              left: {
+                width:wp('55%'),
+                shouldStretchDrawer: false,
+              }
+            }
+          },
           left: {
             component: {
               id: "Drawer",
@@ -440,7 +500,7 @@ const appNavigation =()=>
                   stack: {
                     children: [{
                       component:{
-                        name:'UrPicsPay.PastChallenges',
+                        name:'UrPicsPay.UrPortfolio',
                         id:'past',
 
                         options: {
@@ -453,7 +513,7 @@ const appNavigation =()=>
                             animate: true,
                             hideOnScroll: true,
                             title: {
-                              text: 'Past Challanges',
+                              text: 'Portfolio',
                               color:'#000000',
                               alignment: 'center'                              
                             },
@@ -476,8 +536,54 @@ const appNavigation =()=>
                       bottomTab: {
                         borderColor: 'red',
                         borderHeight: 1.3,
-                        text: 'Past',
-                        icon:sources[2],
+                        text: 'Portfolio',
+                        icon:sources[7],
+                        iconColor: 'lightgrey',
+                        selectedIconColor: '#29abe2',
+                        textColor: 'lightgrey',
+                        selectedTextColor: '#29abe2',
+                        fontFamily: 'ProximaNova-Bold',
+                        fontSize:10
+                      }
+                    }
+                  }
+                }, 
+                {
+                  stack: {
+                    children: [{
+                      component:{
+                        name:'UrPicsPay.BuyAndSellView',
+                        id:'Bidding',
+
+                        options: {
+                          topBar: {
+                            background: {
+                              color: '#ffffff'
+                            },
+                           
+                            drawBehind: false,
+                            animate: true,
+                            hideOnScroll: true,
+                            title: {
+                              text: 'Bidding',
+                              color:'#000000',
+                              alignment: 'center'                              
+                            },
+                            leftButtons: [{
+                              id: 'openSideDrawer',
+                              icon:sources[3],
+                              color:'#000000',
+                            }],
+                          }
+                        }
+                      }
+                    }],
+                    options: { 
+                      bottomTab: {
+                        borderColor: 'red',
+                        borderHeight: 1.3,
+                        text: 'Bidding',
+                        icon:sources[6],
                         iconColor: 'lightgrey',
                         selectedIconColor: '#29abe2',
                         textColor: 'lightgrey',

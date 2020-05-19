@@ -1,5 +1,4 @@
 
-
 import img1 from '../../images/voteSubmited.png';
 import { FlatGrid } from 'react-native-super-grid';
 import FastImage from 'react-native-fast-image';
@@ -35,10 +34,11 @@ import {
   ActivityIndicator,
   Button
 } from 'react-native';
-
+import Lightbox from 'react-native-lightbox';
 import Topbar from './topbar';
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation';
+import { FlatList } from 'react-native-gesture-handler';
 
 class TopPhotosView extends React.Component {
   constructor(props){
@@ -126,12 +126,130 @@ class TopPhotosView extends React.Component {
     }
   }
 
+  setZoomRef = node => { //the ScrollView has a scrollResponder which allows us to access more methods to control the ScrollView component
+    if (node) {
+      this.zoomRef = node
+      console.log(this.zoomRef);
+      // this.scrollResponderRef = this.zoomRef.getScrollResponder()
+    }
+  }
+
+  OpenLightBox = (event) =>{
+    this.zoomRef.open();
+  }
+
   submitVotes = () => {
 
 this.setState({
   ShowVoteButton:true
 })
   }
+  RenderVoteImage =({ item, index }) =>{
+            
+            let field ='Height'+index;
+            let width = 'Widht'+index
+            let Loading = 'Loading'+index;
+            const REference = 'Loading'+index;
+            // console.log(REference);
+            return(
+               <Lightbox 
+               ref={ref=>(this.REference.index = ref)}
+          style={{justifyContent: "center",}}
+          springConfig={{ overshootClamping: true }}
+            renderContent={() => (
+                  <Image style={{alignSelf: "center", width: '100%', height: '100%',resizeMode:'contain'}}
+                               source={{    uri: item.url
+                              }}
+                              resizeMode={'contain'}
+                               /> 
+            )}
+        >
+           
+
+           <TouchableOpacity
+
+onPress={()=>{
+  // this.onCategoryClick(item.id,index);
+  // this.props.add_voting_to_Images(index);
+  console.log(this.REference);
+  this.REference.index.open();
+
+}}
+
+style={styles.view_photo_1}>
+
+                             <ImageBackground  
+                             style={styles.view_img_bg,{height:hp('25'),}} 
+                             onLoad={
+                              (evt) => {
+                                // console.log(evt.nativeEvent);
+                                this.setState({
+                                  [field]:evt.nativeEvent.source.height,
+                                  [width]:evt.nativeEvent.source.width
+                                })
+                              }
+                            }
+                            onLoadStart={() => { this.setState({ [Loading]: true })} }
+                            onLoadEnd={() => { this.setState({ [Loading]: false })} }
+                             source={{uri: item.url}}
+                            // resizeMode={'cover'}
+                            // resizeMode={}
+                            resizeMethod={'scale'}
+                             >
+
+          {this.state[Loading]?
+          <View style={{justifyContent:'center',alignContent:'center',alignItems:'center',flex:1}}>
+          <ActivityIndicator animating={ this.state[Loading] } size={'large'} color={'#29ABE2'} />
+          <Text>
+            Loading Image ...
+          </Text>
+          </View>
+          :<React.Fragment>
+          {
+                item.liked?<TouchableOpacity onPress={()=>{
+                  this.onLikedCliced(item.id,index);
+                  this.props.Add_Image_To_Like_List(index);
+                }} style={{ height:wp('10%'),width:wp('10%'), marginLeft: wp('1.9%') }}>
+                {/* <i class="far fa-heart"></i> */}
+ {item.liked?
+ <Ioncin name="ios-heart" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" />:<Icon name="heart" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" />}
+ </TouchableOpacity>:<TouchableOpacity onPress={()=>{
+                          this.onLikedCliced(item.id,index);
+                               this.props.Add_Image_To_Like_List(index);
+                             }} style={{height:wp('10%'),width:wp('10%'), marginLeft: wp('0.75%') }}>
+                             {/* <i class="far fa-heart"></i> */}
+              {item.liked?
+              <Ioncin name="ios-heart" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" />:<Icon name="heart" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" />}
+              </TouchableOpacity>
+              }
+
+                          {item.reported?
+                          <TouchableOpacity  style={{ height:wp('10%'),width:wp('10%'),  marginLeft: wp('2%'),zIndex:9129 }} >
+                          <Ioncin onPress={()=>{
+                            this.onReportButtonClicked(item.id,index)
+                            this.props.ADD_IMAGE_TO_REPORT_LIST(index);
+                          }} name='ios-help-circle' size={wp('10%')} style={{fontWeight:'bold'}} color='#29ABE2' />
+                          </TouchableOpacity>:<TouchableOpacity style={{ height:wp('12%'),width:wp('12%'), marginLeft: wp('0.75%') ,zIndex:9129}} >
+                          <Icon onPress={()=>{
+                            this.onReportButtonClicked(item.id,index)
+                            this.props.ADD_IMAGE_TO_REPORT_LIST(index);
+                          }} name="question" style={{fontWeight:'bold'}} size={wp('10%')} color="#29ABE2" light />
+                          </TouchableOpacity>}
+
+                          <View>
+                              {item.selected?<React.Fragment>
+      {item.selected?<Image  source={img1}  style={{height:wp('15%'),width:wp('15%'),zIndex:99999}} />:<React.Fragment></React.Fragment>}
+      </React.Fragment>:<React.Fragment></React.Fragment>}
+                          </View></React.Fragment>}
+             
+  </ImageBackground>
+</TouchableOpacity>
+              </Lightbox>
+        
+
+
+          )
+          }
   
 
   // componentWillUnmount = () =>{
@@ -140,7 +258,7 @@ this.setState({
   // } 
 
   render() {
-    console.log(this.state);
+    // console.log(this.state);
     const items = [
         { name: 'TURQUOISE', code: '#1abc9c' }, { name: 'EMERALD', code: '#2ecc71' },
         { name: 'PETER RIVER', code: '#3498db' }, { name: 'AMETHYST', code: '#9b59b6' },
@@ -255,84 +373,10 @@ this.setState({
         </View> */}
       {loader}
       {ShowVote}
-        <FlatGrid
-          itemDimension={wp('35%')}
-          items={this.props.Images}
-          spacing={0}
-          style={styles.gridView}
-          // staticDimension={300}
-          // fixed
-          // spacing={20}
-          renderItem={({ item, index }) =>{
-            // console.log(item);
-            return(
-            
-              <TouchableOpacity
-
-              onPress={()=>{
-                this.onCategoryClick(item.id,index);
-                this.props.add_voting_to_Images(index);
-              }}
-              
-              style={styles.view_photo_1}>
-                 <FastImage style={styles.view_img_bg} 
-                                         source={{    uri: item.url
-                                        ,priority: FastImage.priority.high
-                                        }}
-                                        resizeMode={FastImage.resizeMode.cover}
-                                         >
-                            {
-                              item.liked?<TouchableOpacity onPress={()=>{
-                                this.onLikedCliced(item.id,index);
-                                this.props.Add_Image_To_Like_List(index);
-                              }} style={{ height:wp('8%'),width:wp('8%'), marginLeft: wp('1.9%') }}>
-                              {/* <i class="far fa-heart"></i> */}
-               {item.liked?
-               <Ioncin name="ios-heart" size={wp('6.5%')} color="#ffffff" />:<Icon name="heart" size={wp('8%')} color="#ffffff" />}
-               </TouchableOpacity>:<TouchableOpacity onPress={()=>{
-                                        this.onLikedCliced(item.id,index);
-                                             this.props.Add_Image_To_Like_List(index);
-                                           }} style={{height:wp('8%'),width:wp('8%'), marginLeft: wp('0.75%') }}>
-                                           {/* <i class="far fa-heart"></i> */}
-                            {item.liked?
-                            <Ioncin name="ios-heart" size={wp('6%')} color="#ffffff" />:<Icon name="heart" size={wp('8%')} color="#ffffff" />}
-                            </TouchableOpacity>
-                            }
-
-                                        {item.reported?
-                                        <TouchableOpacity  style={{ height:wp('8%'),width:wp('8%'),  marginLeft: wp('1.5%'),zIndex:9129 }} >
-                                        <Ioncin onPress={()=>{
-                                          this.onReportButtonClicked(item.id,index)
-                                          this.props.ADD_IMAGE_TO_REPORT_LIST(index);
-                                        }} name='ios-help-circle' size={wp('7.5%')} color='#ffffff' />
-                                        </TouchableOpacity>:<TouchableOpacity style={{ height:wp('8%'),width:wp('8%'), marginLeft: wp('0.75%') ,zIndex:9129}} >
-                                        <Icon onPress={()=>{
-                                          this.onReportButtonClicked(item.id,index)
-                                          this.props.ADD_IMAGE_TO_REPORT_LIST(index);
-                                        }} name="question" size={wp('8%')} color="#ffffff" light />
-                                        </TouchableOpacity>}
-
-                                        <View>
-                                            {item.selected?<React.Fragment>
-                    {item.selected?<Image  source={img1}  style={{height:wp('10%'),width:wp('10%')}} />:<React.Fragment></React.Fragment>}
-                    </React.Fragment>:<React.Fragment></React.Fragment>}
-                                        </View>
-                                        
-
-                {/* <ImageBackground style={styles.view_img_bg} source={{uri: item.url}}
-                
-                resizeMode={'contain'}> */}
-
-               
-                                           {/* <View style={styles.view_overlay}> */}
-                
-
-                {/* </View> */}
-                {/* </ImageBackground> */}
-                </FastImage>
-            </TouchableOpacity>
-          )
-          }}
+        <FlatList
+          data={this.props.Images}
+          renderItem={this.RenderVoteImage}
+          keyExtractor={(item) =>item.id}
         />
 
         {this.state.selectedItems.length >0 || this.state.LikedItems.length >0  || this.state.ReporetedItems.length >0?
@@ -351,10 +395,10 @@ this.setState({
 const styles = StyleSheet.create({
   conatainer: {
     flex: 1,
-    flexDirection: 'column',
-    alignContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'auto',
+    // flexDirection: 'column',
+    // alignContent: 'center',
+    // alignItems: 'center',
+    // alignSelf: 'auto',
     backgroundColor: '#F4F7FC',
     zIndex:0
   },
@@ -378,25 +422,14 @@ const styles = StyleSheet.create({
   },
   view_photo_1: {
     flex: 1,
-    // margin:wp('0.6'),
-    height:wp('30%'),
-    // borderColor:'#000',
-    // borderRadius:2,
-    // borderWidth:1
+    borderRadius:5,
+    borderColor:'white',
+    marginTop:wp('1.5%'),
   },
   view_number: {
-    // marginLeft: wp('35%'),
-    // marginTop: wp('0.5%'),
-    // height: wp('10%'),
-    // width: wp('10%'),
-    // padding: wp('1%'),
     zIndex:2,
-    // backgroundColor: '#ffffff',
     borderRadius: wp('0.5%'),
-    // justifyContent: 'center',
-    // alignSelf: 'auto',
-    // alignItems: 'center',
-    // alignContent: 'center',
+
   },
   view_img_bg: {
     width: '100%',
@@ -448,7 +481,7 @@ const styles = StyleSheet.create({
 
   },
   gridView: {
-    marginTop:wp('5%'),
+    // marginTop:wp('5%'),
     flex: 1,
   },
 

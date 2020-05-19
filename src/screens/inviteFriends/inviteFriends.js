@@ -52,7 +52,7 @@ class FriendInvite extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tableHead: ['Email_Address', 'Status', 'Date'],
+      tableHead: ['Email Address', 'Status', 'Date'],
       widthArr: [wp('52%'), wp('18%'), wp('23%')],
       email:'',
       name:'',
@@ -198,7 +198,7 @@ class FriendInvite extends Component {
     const tableData = [];
     for (let i = 0; i < this.props.friendsdata.length; i += 1) {
       const rowData = [];
-      rowData.push(`${this.props.friendsdata[i].friend_email}`,`${this.props.friendsdata[i].state}`,`${this.props.friendsdata[i].datetime}`);
+      rowData.push(`${this.props.friendsdata[i].friend_email}`,`${this.props.friendsdata[i].state == 'join'?'joined':this.props.friendsdata[i].state}`,`${this.props.friendsdata[i].datetime}`);
 
       tableData.push(rowData);
     }
@@ -237,17 +237,17 @@ class FriendInvite extends Component {
                   <View style={styles.InviteFriednsTextView}>
                     <View style={styles.InviteFriednsTextBold}>
                       <Text style={styles.InviteFriednsTextBoldInner}>
-                        INVITE FRIENDS AND GET CASH REWARDS!
+                      Invite Your Friends to UrPixPays {'&'} get Cash Rewards!
                             </Text>
                     </View>
                     <View style={styles.InviteFriendsTextInfoView}>
-                      <Text style={styles.InviteFriednsText}>- If Your Friends Signs up through your invitation, both of you recive $0.10</Text>
+                      <Text style={styles.InviteFriednsText}>1. If your friend signs up through your invitation,  you will receive $0.10.</Text>
                     </View>
                     <View style={styles.InviteFriendsTextInfoView}>
-                      <Text style={styles.InviteFriednsText}>- If Your Friends Join,you will receive $0.05</Text>
+                      <Text style={styles.InviteFriednsText}>2. If your friend’s friend joins, you will receive $0.05.</Text>
                     </View>
                     <View style={styles.InviteFriendsTextInfoView}>
-                      <Text style={styles.InviteFriednsText}>- As a Member you have a liftime earnings from your invites` purchase transictions</Text>
+                      <Text style={styles.InviteFriednsText}>3. As a member you have a lifetime earnings from your invitees’ purchase transactions.</Text>
                     </View>
                   </View>
                 </View>
@@ -514,7 +514,8 @@ const styles = StyleSheet.create({
     alignItems:'center',
     textAlignVertical:'center',
     fontSize: wp('3%'),
-    fontFamily: 'Raleway'
+    fontFamily: 'Raleway',
+    paddingLeft:wp('1.5%')
   },
   // InviteFriendBottomOuterView:{
   //     justifyContent:'center',

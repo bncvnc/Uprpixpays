@@ -1,46 +1,38 @@
 {
   "project_info": {
-    "project_number": "330067815135",
-    "firebase_url": "https://urpixpays-20124.firebaseio.com",
-    "project_id": "urpixpays-20124",
-    "storage_bucket": "urpixpays-20124.appspot.com"
+    "project_number": "46008707050",
+    "firebase_url": "https://urpixpays-d8409.firebaseio.com",
+    "project_id": "urpixpays-d8409",
+    "storage_bucket": "urpixpays-d8409.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:330067815135:android:687f6b9bdc54f0dcc4576a",
+        "mobilesdk_app_id": "1:46008707050:android:058940e279317cd1c03493",
         "android_client_info": {
           "package_name": "com.urpixpays"
         }
       },
       "oauth_client": [
         {
-          "client_id": "330067815135-kfmo2pm95i6m8r9g23d0qq45f0i3dq4h.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.urpixpays",
-            "certificate_hash": "919fac652b0bc328a9e71366d5220bfd781f2b6d"
-          }
-        },
-        {
-          "client_id": "330067815135-d5ic1gjut5k75d1u412g9fe7je35sphu.apps.googleusercontent.com",
+          "client_id": "46008707050-ql4nif3hvufcg985olo6f5jf36rk6pir.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCI7F_qynmhj6z13VSVvfPRcced7lLpRPo"
+          "current_key": "AIzaSyD-exXr7gK7FXPwMoDgUORSRU1F44OpQmY"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "330067815135-d5ic1gjut5k75d1u412g9fe7je35sphu.apps.googleusercontent.com",
+              "client_id": "46008707050-ql4nif3hvufcg985olo6f5jf36rk6pir.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "330067815135-3tsuuj7bjguo1po0q7k7pnoohvcglbbf.apps.googleusercontent.com",
+              "client_id": "46008707050-2g3kedpnjkle9cre3crtdetklata7udj.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.urpixpay.UrpixPays"

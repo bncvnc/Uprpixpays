@@ -4,7 +4,7 @@
 import Icons from 'react-native-vector-icons/FontAwesome';
 import IconsM from 'react-native-vector-icons/MaterialIcons';
 
-import {Platform} from 'react-native';
+import {Platform,Text,TextInput} from 'react-native';
 import { Navigation } from "react-native-navigation";
 import MainScreen from './src/screens/mainscreen/mainscreen';
 import SignUp from "./src/screens/signup/signup";
@@ -49,6 +49,19 @@ import VerificationCode from './src/screens/login/Verification_code';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ChallengeTopPhotos from './src/screens/ChallengeTopPhotos/ChallengeTopPhotos';
 import ChallengeEnded from './src/screens/challenges/ChallengeEnded';
+import CartNotifications from './src/screens/Biddings/CartNotifications';
+import AddSubscriptionScreen from './src/screens/AddSubscriptionScreen';
+import Products_Purchased from './src/screens/Products_Purchased/Products_Purchased';
+import UrTrasaction from './src/screens/UrTrasaction/UrTrasaction';
+import UrPortfolio from './src/screens/portfolio/UrPortfolio';
+import depositThroughToPaypall from './src/screens/depositThroughToPaypall/depositThroughToPaypall';
+import socialSingup from './src/screens/signup/socialSingup';
+import ShowImages from './src/screens/ShowImages/ShowImages';
+import ShowProfileImages from './src/screens/ShowImages/ShowProfileImages';
+
+
+
+
 
 
 const store = configureStore();
@@ -93,6 +106,15 @@ Navigation.registerComponentWithRedux(`UrPicsPay.Biddings`, () => Biddings,Provi
 Navigation.registerComponentWithRedux(`UrPicsPay.VerificationCode`, () => VerificationCode,Provider,store);
 Navigation.registerComponentWithRedux(`UrPicsPay.ChallengeTopPhotos`, () => ChallengeTopPhotos,Provider,store);
 Navigation.registerComponentWithRedux(`UrPicsPay.ChallengeEnded`, () => ChallengeEnded,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.CartNotifications`, () => CartNotifications,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.AddSubscriptionScreen`, () => AddSubscriptionScreen,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.Products_Purchased`, () => Products_Purchased,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.UrTrasaction`, () => UrTrasaction,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.UrPortfolio`, () => UrPortfolio,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.depositThroughToPaypall`, () => depositThroughToPaypall,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.socialSingup`, () => socialSingup,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.ShowImages`, () => ShowImages,Provider,store);
+Navigation.registerComponentWithRedux(`UrPicsPay.ShowProfileImages`, () => ShowProfileImages,Provider,store);
 
 
 if(Platform.OS==='android'){
@@ -156,7 +178,16 @@ if(Platform.OS==='android'){
 
 
 Navigation.events().registerAppLaunchedListener(() => {
-  
+	if (Text.defaultProps == null) Text.defaultProps = {};
+	Text.defaultProps.allowFontScaling = false;
+	if (TextInput.defaultProps == null) TextInput.defaultProps = {};
+	TextInput.defaultProps.allowFontScaling = false;
+	Navigation.setDefaultOptions({
+		layout: {
+			orientation: ["portrait"],
+		},
+	
+	});
   Navigation.setRoot({
     
     root:{

@@ -157,7 +157,7 @@ class FriendInvite extends Component {
                 {/* Invite Friedns Top IVew */}
                 <View style={styles.InviteFriendsTopView}>
                   <Text style={styles.InviteFriendsTopViewText}>
-                    Invite Friedns
+                    Invite Friends
                     </Text>
                 </View>
                 {/* Invite Friends Middle View */}
@@ -165,22 +165,22 @@ class FriendInvite extends Component {
                   <View style={styles.InviteFriendsPic}>
                     <Image source={userImage} style={{ width: wp('45%'), height: wp('45%') }} />
                   </View>
-                  <View style={styles.InviteFriednsTextView}>
+                  {/* <View style={styles.InviteFriednsTextView}>
                     <View style={styles.InviteFriednsTextBold}>
                       <Text style={styles.InviteFriednsTextBoldInner}>
                         INVITE CHALLENGE AND GET CASH REWARDS!
                             </Text>
                     </View>
                     <View style={styles.InviteFriendsTextInfoView}>
-                      <Text style={styles.InviteFriednsText}>- If Your Friends Signs up through your invitation, both of you recive $0.10</Text>
+                      <Text style={styles.InviteFriednsText}>1. If your friend signs up through your invitation, both of you will receive $0.10</Text>
                     </View>
                     <View style={styles.InviteFriendsTextInfoView}>
-                      <Text style={styles.InviteFriednsText}>- If Your Friends Friend Join,you will recive $0.05</Text>
+                      <Text style={styles.InviteFriednsText}>2. If your friend’s friend joins, you will receive $0.05</Text>
                     </View>
                     <View style={styles.InviteFriendsTextInfoView}>
-                      <Text style={styles.InviteFriednsText}>- As a Member you have a liftime earnings from your invites` purchase transictions</Text>
+                      <Text style={styles.InviteFriednsText}>3. As a member you have a lifetime earnings from your invitees’ purchase transactions</Text>
                     </View>
-                  </View>
+                  </View> */}
                 </View>
                 {/* Invite Friends Lower View */}
                 <View style={styles.InviteFriendBottomOuterView_p}>
@@ -247,7 +247,7 @@ class FriendInvite extends Component {
               <View style={styles.inviteFirendsTable}>
                 <View style={{ marginLeft: wp('5%'), padding: wp('2%') }}>
                   <Text style={{ fontSize: wp('4%'), fontFamily: 'Roboto', fontWeight: '500' }}>
-                    Invited Friedns
+                    Invited Friends
                 </Text>
                 </View>
                 <View style={styles.tebleViewStyle}>

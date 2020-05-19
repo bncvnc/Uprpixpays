@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   view_overlay: {
     height: '100%',
     width: '100%',
-    backgroundColor: 'rgba(0, 0, 0, .4)',
+    // backgroundColor: 'rgba(0, 0, 0, .4)',
   },
   view_overlay1: {
     height: wp('5%'),

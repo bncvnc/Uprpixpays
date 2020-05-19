@@ -65,8 +65,6 @@ export const loginUser = (loginData,componentId) =>{
             user: userData
           };
           console.log(appState);
-          // save app state with user date in local storage
-          // AsyncStorage["appState"] = JSON.stringify(appState);
           AsyncStorage.setItem("appState", JSON.stringify(appState));
           dispatch(saveUserInfo(appState))
         //   this.setState({
@@ -99,7 +97,11 @@ export const loginUser = (loginData,componentId) =>{
                   },
                   options: {
                     topBar: {
-                      visible:false
+                      visible:true,
+                      title: {
+                        text: 'Verification',
+                        alignment: 'center'
+                      }
                     },
                     animations: {
                       push: {
@@ -149,7 +151,7 @@ export const deletestateData = () => {
 
 export const resiterUser = (authdata,componentId) => {
   return dispatch =>{
-    //console.log(authdata);
+    console.log(authdata);
     dispatch(uiStartLoading());
       fetch('https://urpixpays.com/stagging_urpixpays/sendvc1', {
           method:'POST',
@@ -198,7 +200,7 @@ export const resiterUser = (authdata,componentId) => {
             //   }
             // });
             Navigation.pop(componentId);
-            alert('A Varification code is Sent to your provided email');
+            alert('A varification code is sent to your provided email.');
             }else if(responseData.message === 'Sent VC to email')  {
               dispatch(uiStopLoading());
               // changeScreen('UrPicsPay.Login');
@@ -221,13 +223,81 @@ export const resiterUser = (authdata,componentId) => {
               //   }
               // });
               Navigation.pop(componentId);
-              alert('A Varification code is Sent to your provided email');
+              alert('A Varification code was Sent to your provided email.');
             }
             else{
               alert('Registeration Failed! ' + responseData.message)
               dispatch(uiStopLoading());
 
             }
+          }).catch((err) =>{
+            console.log(err);
+          })
+      .done();
+  }
+}
+
+export const resiterUserThroughSocial = (authdata,componentId) => {
+  return dispatch =>{
+    //console.log(authdata);
+    dispatch(uiStartLoading());
+      fetch('https://urpixpays.com/stagging_urpixpays/sendvc12', {
+          method:'POST',
+          headers: {
+          Accept:'application/json',
+          'Content-Type':'application/json',
+          },
+          body:JSON.stringify({
+            "name":authdata.name,
+            "email":authdata.email,
+            "password":authdata.password,
+            "mobile_number":authdata.mobile_number,
+            "age":authdata.age,
+            "country":authdata.country,
+            "city":authdata.city,
+          }),
+      })
+          .then((response) => response.json())
+          .then((responseData) => {
+            //console.log(responseData);
+          "POST Response",
+          "Response Body -> "+JSON.stringify(responseData)
+          console.log(responseData);
+
+          let userData = {
+            id: responseData.data.no,
+            name: responseData.data.name,
+            age:responseData.data.age,
+            age1:responseData.data.age1,
+            email: responseData.data.email,
+            mobilenum:responseData.data.mobilenum,
+            auth_token: responseData.data.auth_token,
+            no:responseData.data.no,
+            pass:responseData.data.pass,
+            password:responseData.data.password,
+            permission:responseData.data.permission,
+            profile_image:responseData.data.profile_image,
+            register_date:responseData.data.register_date,
+            role:responseData.data.role,
+            vc:responseData.data.role,
+            verifyc_code:responseData.data.verifyc_code,
+            timestamp: new Date().toString(),
+            city:responseData.data.city,
+            status:responseData.data.status,
+            country:responseData.data.country,
+          };
+          let appState = {
+            isLoggedIn: true,
+            user: userData
+          };
+
+          AsyncStorage.setItem("appState", JSON.stringify(appState));
+          dispatch(saveUserInfo(appState))
+          
+          appNavigation();
+          }).catch((err) =>{
+            alert('Something went wrong can you please try different social sinup method or signup with email regards UrPixPays.')
+            console.log(err);
           })
       .done();
   }
@@ -385,10 +455,12 @@ export const socialSinup =(email)=>
   }
 }
 
-export const socialSignIn = (email,name) =>
+export const socialSignIn = (email,name,cid) =>
 {
   console.log('yes yes');
   return dispatch => {
+    // alert(email);
+    console.log(cid);
     dispatch(uiStartLoading());
   fetch('https://urpixpays.com/stagging_urpixpays/social_signup', {
     method:'POST',
@@ -407,7 +479,8 @@ export const socialSignIn = (email,name) =>
     "POST Response",
     "Response Body -> "+JSON.stringify(responseData)
     console.log('helo = ', responseData);
-      if (responseData.message == "user login successfully" ) {
+      if (responseData.success) {
+        // alert(responseData.data);
         // alert(`Loged in Successful!`);
         let userData = {
           name: responseData.data.name,
@@ -447,7 +520,32 @@ export const socialSignIn = (email,name) =>
         dispatch(uiStopLoading());
         appNavigation();
         
-      } 
+      } else if(!responseData.success){
+        dispatch(uiStopLoading());
+        // Navigation.push(cid, {
+        //   component: {
+        //     name: 'UrPicsPay.socialSingup',
+        //     passProps: {
+        //       email: email,
+        //       name:name
+        //     },
+        //     options: {
+        //       topBar: {
+        //         visible: true,
+        //         title: {
+        //           text: 'SignUp',
+        //           alignment: 'center'
+        //         }
+        //       },
+        //       animations: {
+        //         push: {
+        //            waitForRender: true
+        //         }
+        //      }
+        //     }
+        //   }
+        // });
+      }
       //else if(responseData.message  === 'Please signin with your verification code.' && responseData.data == null)
       // {
 
@@ -473,6 +571,8 @@ export const socialSignIn = (email,name) =>
 
         dispatch(uiStopLoading());
       }
+    }).catch((err) =>{
+      console.log('asdasd');
     })
     .done();
 

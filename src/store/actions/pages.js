@@ -23,7 +23,9 @@ import {
       ADD_VOTETING_LIST,
       SAVE_PAGINATION_DATA,
       AddImageToLikeList,
-      ADDIMAGETOREPORTLIST
+      ADDIMAGETOREPORTLIST,
+      ON_VOTE_PRESSED,
+      ON_VOTE_PRESSED_RESET
 } from './actiontypes';
 import {navigation, Navigation} from 'react-native-navigation';
 import {uiStartLoading,uiStopLoading} from './index';
@@ -72,7 +74,7 @@ export const getDetailsImage = () => {
       fetch('https://urpixpays.com/stagging_urpixpays/challenges/detail/'+ChallengeId)
          .then((response) => response.json())
          .then((responseData) => {
-            // console.log(responseData);
+            console.log(responseData);
 
             let data = [];
             // for (const key in responseData.rank){
@@ -83,11 +85,13 @@ export const getDetailsImage = () => {
          
             console.log(data)
             dispatch(SaveDetailsImages(data));
+         }).catch((err) =>{
+            console.log(err);
          })
    }
 }
 
-export const SaveUserInfoWallet = (type, text) => {
+export const SaveUserInfoWallet = (type, text,componentId) => {
    return (dispatch,getState) => {
       dispatch(uiStartLoading());
       fetch('https://urpixpays.com/stagging_urpixpays/userpix/get', {
@@ -110,12 +114,149 @@ export const SaveUserInfoWallet = (type, text) => {
             dispatch(uiStopLoading());
                if(responseData.message === 'You do not have sufficient balance in your wallet!')
                {
-                  alert('You do not have sufficient balance in your wallet! $' + responseData.data);
+                  Alert.alert(
+                     'Alert',
+                     'You do not have sufficient balance in your wallet! $' + responseData.data,
+                     [
+                       {text: 'OK', onPress: () => {
+                        Navigation.push(componentId, {
+                           component: {
+                             name: 'UrPicsPay.BalanceOverView',
+                             passProps: {
+                               text: 'Pushed screen'
+                             },
+                             options: {
+                               sideMenu: {
+                                 left: {
+                                     visible: false,
+                                     enabled: false
+                                   }
+                             },
+                               topBar: {
+                                 visible:true,
+                                 title:{
+                                   text:'Blannce Overview',
+                                   alignment:'center'
+                                 }
+                               },
+                               bottomTabs:{
+                                 visible:false,
+                                 drawBehind:true,
+                                 animate:true
+                               },
+                               animations: {
+                                   push: {
+                                      waitForRender: true
+                                   }
+                                }
+                             }
+                           }
+                         });
+
+                       }},
+                     ],
+                     {cancelable: false},
+                   );
+                  
+
                }
                else 
                // if (responseData.data)
                 {
-               alert(`Action Successful!`);
+               alert(responseData.message);
+               dispatch(UserProfileData())
+               dispatch(SaveUserDataInfo(responseData.data.Flip, responseData.data.Charge,
+                  responseData.data.Wand, responseData.data.walet));
+               // dispatch(uiStopLoading());
+               // changeScreen('UrPicsPay.mychallenges');
+            } 
+            // else if (!responseData.data) {
+               
+            //    //   dispatch(uiStopLoading());
+            //    //   alert(responseData.data);
+            // }
+         })
+         .catch((err) => {
+            console.log(err)
+            dispatch(uiStopLoading())
+         })
+         .done();
+   }
+}
+
+export const SaveUserInfoPayThroughInApp = (type, text,componentId) => {
+   return (dispatch,getState) => {
+      dispatch(uiStartLoading());
+      fetch('https://urpixpays.com/stagging_urpixpays/userpix/getnowallet', {
+         method: 'POST',
+         headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+            "uid":getState().user.user.no,
+            "type": parseInt(type),
+            "amount": parseInt(text)
+         }),
+      })
+         .then((response) => response.json())
+         .then((responseData) => {
+            console.log(responseData.data);
+            "POST Response",
+               "Response Body -> " + JSON.stringify(responseData)
+            dispatch(uiStopLoading());
+               if(responseData.message === 'You do not have sufficient balance in your wallet!')
+               {
+                  Alert.alert(
+                     'Alert',
+                     'You do not have sufficient balance in your wallet! $' + responseData.data,
+                     [
+                       {text: 'OK', onPress: () => {
+                        Navigation.push(componentId, {
+                           component: {
+                             name: 'UrPicsPay.BalanceOverView',
+                             passProps: {
+                               text: 'Pushed screen'
+                             },
+                             options: {
+                               sideMenu: {
+                                 left: {
+                                     visible: false,
+                                     enabled: false
+                                   }
+                             },
+                               topBar: {
+                                 visible:true,
+                                 title:{
+                                   text:'Blannce Overview',
+                                   alignment:'center'
+                                 }
+                               },
+                               bottomTabs:{
+                                 visible:false,
+                                 drawBehind:true,
+                                 animate:true
+                               },
+                               animations: {
+                                   push: {
+                                      waitForRender: true
+                                   }
+                                }
+                             }
+                           }
+                         });
+
+                       }},
+                     ],
+                     {cancelable: false},
+                   );
+                  
+
+               }
+               else 
+               // if (responseData.data)
+                {
+               alert(responseData.message);
                dispatch(UserProfileData())
                dispatch(SaveUserDataInfo(responseData.data.Flip, responseData.data.Charge,
                   responseData.data.Wand, responseData.data.walet));
@@ -137,9 +278,19 @@ export const SaveUserInfoWallet = (type, text) => {
 }
 
 
+
 export const GiveVoteToImages = (votearray,likedarray,reportarray) => {
    return (dispatch,getState) => {
-      dispatch(uiStartLoading());
+      // dispatch(uiStartLoading());
+      let  NewVotes = getState().BestImages.VoteImages.filter((e) =>{
+         // console.log(e.selected);
+        return e.selected ==false
+       })
+       
+       console.log(NewVotes);
+       dispatch(SaveVoteImages(NewVotes));
+       let data =[];
+       dispatch(OnVotePressedReset(data))
       fetch('https://urpixpays.com/stagging_urpixpays/voting/set', {
          method: 'POST',
          headers: {
@@ -160,7 +311,7 @@ export const GiveVoteToImages = (votearray,likedarray,reportarray) => {
             "POST Response",
                "Response Body -> " + JSON.stringify(responseData)
                dispatch(uiStopLoading());
-
+              
                if(responseData.message === 'You do not have sufficient balance in your wallet!')
                {
                   alert('You do not have sufficient balance in your wallet! $' + responseData.data);
@@ -170,12 +321,7 @@ export const GiveVoteToImages = (votearray,likedarray,reportarray) => {
                 {
 
                   
-                let  NewVotes = getState().BestImages.VoteImages.filter((e) =>{
-                     // console.log(e.selected);
-                    return e.selected ==false
-                   })
-                   console.log(NewVotes);
-                   dispatch(SaveVoteImages(NewVotes));
+                
                // alert(`Successfully Voted`);
                // this.UserProfileData(),
                // dispatch(SaveUserDataInfo(responseData.data.Flip, responseData.data.Charge,
@@ -200,6 +346,13 @@ export const GiveVoteToImages = (votearray,likedarray,reportarray) => {
 export const GiveVoteAndMoveBAck = (votearray,likedarray,reportarray) => {
    return (dispatch,getState) => {
       // dispatch(uiStartLoading());
+      let  NewVotes = getState().BestImages.VoteImages.filter((e) =>{
+         // console.log(e.selected);
+        return e.selected ==false
+       })
+       
+       dispatch(SaveVoteImages(NewVotes));
+       dispatch(OnVotePressedReset([]));
       fetch('https://urpixpays.com/stagging_urpixpays/voting/set', {
          method: 'POST',
          headers: {
@@ -258,7 +411,7 @@ export const GiveVoteAndMoveBAck = (votearray,likedarray,reportarray) => {
 }
 export const GetVoteImages = () => {
    return (dispatch,getState) => {
-      console.log(getState().BestImages.CurrentChallenge.length);
+      console.log('asdasdasdasdasd gettinsn fsdf');
       let ChallengeId = getState().BestImages.CurrentChallenge.length == 1 ?getState().BestImages.CurrentChallenge[0].id:getState().BestImages.CurrentChallenge;
       fetch('https://urpixpays.com/stagging_urpixpays/challenges/voting/cid/'+ChallengeId+'/uid/'+getState().user.user.no)
          .then((response) => response.json())
@@ -493,7 +646,7 @@ export const ForgotPassword = (email) => {
             }
             else {
                dispatch(uiStopLoading());
-               alert('Request sent to email');
+               alert('Your password has been sent to your email.');
             }
 
          })
@@ -694,6 +847,7 @@ export const UserProfileData = () => {
          
                let userData = {
                   name: responseData.u_name,
+                  cover_img:responseData.cover_img,
                   email: responseData.u_email,
                   age: responseData.u_age,
                   timestamp: responseData.u_date,
@@ -706,7 +860,8 @@ export const UserProfileData = () => {
                   charge: responseData.u_Charge,
                   rank: responseData.u_rank,
                   pixpoints: responseData.u_pixpoint,
-                  points: responseData.u_points
+                  points: responseData.u_points,
+                  password:responseData.password
                };
 
                // let appState = {
@@ -850,7 +1005,7 @@ export const AddMorePages =(sort,search)=>
 {
    // const { params } = this.props.navigation.state;
    return(dispatch,getState)=>
-   {dispatch(uiStartLoading());
+   {
       fetch(getState().BestImages.paginationData.next_page_url)
       .then((response)=>response.json())
       .then((responseData)=>
@@ -1346,5 +1501,17 @@ export const SaveAppInfo = (first, second, third, fourth, fifth, sixth, sevent, 
       ninghten: ninghten,
       twenty: twenty,
       twentyone: twentyone
+   }
+}
+export const OnVotePressed = (data) => {
+   return {
+      type: ON_VOTE_PRESSED,
+      id:data
+   }
+}
+export const OnVotePressedReset = (data) => {
+   return {
+      type: ON_VOTE_PRESSED_RESET,
+      id:data
    }
 }

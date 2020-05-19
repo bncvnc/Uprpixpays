@@ -25,7 +25,9 @@ import {
     ADD_VOTETING_LIST,
     SAVE_PAGINATION_DATA,
     AddImageToLikeList,
-    ADDIMAGETOREPORTLIST
+    ADDIMAGETOREPORTLIST,
+    ON_VOTE_PRESSED,
+    ON_VOTE_PRESSED_RESET
     } from '../actions/actiontypes';
 import { validate } from '@babel/types';
 const initialState ={
@@ -52,7 +54,7 @@ const initialState ={
     SaveAcceptdata:[],
     getdetailsimages:[],
     paginationData:{},
-
+    selectedItems:[],
 
     first:{},
     second:{},
@@ -157,8 +159,31 @@ const reducer = (state = initialState,action) =>{
                     ...state,
                     getdetailsimages:action.image
                 }
-            
-          
+        case ON_VOTE_PRESSED:
+            if(state.selectedItems.filter(e => e === action.id).length > 0)
+            {   
+                return{
+                    ...state,
+                  selectedItems: state.selectedItems.filter((item)=> {
+                    return item !== action.id;
+                })
+                }
+
+              console.log('This Function Ran');
+            }else{
+
+                return{
+                    ...state,
+                  selectedItems:state.selectedItems.concat(action.id)
+                }
+
+            }
+             
+        case ON_VOTE_PRESSED_RESET:
+            return{
+                ...state,
+                selectedItems:[]
+            }  
         case SAVE_APP_INFO :
             return{
                 ...state,

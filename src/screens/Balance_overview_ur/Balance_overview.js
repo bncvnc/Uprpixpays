@@ -28,7 +28,11 @@ import {
   Image,
   Text,
   StatusBar,
+  findNodeHandle,
+  Modal as NewModal,
+  Button
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Navigation } from "react-native-navigation";
 import ChargeView from '../tables/charge';
 import Buys from '../tables/buy_sell';
@@ -38,7 +42,7 @@ import SideDrawer from '../sidedrawer/sidedrawer';
 import MenuDrawer from 'react-native-side-drawer';
 import DatePicker from 'react-native-datepicker';
 import Icons from 'react-native-vector-icons/FontAwesome';
-
+import { WebView } from 'react-native-webview';
 const axios = require('axios');
 
 class BalanceOverView extends React.Component {
@@ -49,6 +53,9 @@ class BalanceOverView extends React.Component {
     this.props.Balance();
 
     this.state = {
+      payableamount:0,
+      PayVivaPaypall:false,
+      Methode:'',
       pickerSelection: ' Select A Category',
       pickerDisplayed: false,
       amount:0,
@@ -79,6 +86,23 @@ class BalanceOverView extends React.Component {
         
   //   );
   // };
+  handleResponse = data =>{
+    if(data.title === 'Success'){
+      this.setState({
+        PayVivaPaypall:false
+      })
+      // this.PaymentSuccesfull();
+      // this.PayWithPaypall(this.totalAmountPayable,this.CartData)
+    }else if(data.title ==='Cancel')
+    {
+      this.setState({
+        PayVivaPaypall:false 
+      })
+    }
+    else{
+      return;
+    }
+  }
   toggleOpen = () => {
     this.setState({ open: !this.state.open });
   };
@@ -221,6 +245,40 @@ ChangeCharge = () => {
     charge:true
   })
 }
+changeScreen = (screen,title,extraData) => {
+  // AsyncStorage.setItem("screen", JSON.stringify(screen));
+  Navigation.push(this.props.componentId, {
+    component: {
+      name: screen,
+      passProps: {
+        ...extraData
+      },
+      options: {
+        topBar: {
+
+          visible: true,
+          title: {
+            text: title,
+            color: '#000000',
+            alignment: 'center'
+          },
+        },
+
+        bottomTabs: {
+          visible: false,
+          drawBehind: true,
+          animate: true
+        },
+
+        animations: {
+          push: {
+            waitForRender: true
+          }
+        }
+      }
+    }
+  });
+}
 
 RequestWIthDraw = () =>{
   console.log(';asdasdasd');
@@ -229,7 +287,7 @@ RequestWIthDraw = () =>{
     "amount":this.state.amount,
     "account_info":this.state.accountInfo,
     "description":this.state.Description,
-    "type_name":'paypal'
+    "type_name":this.state.Methode
 })
   .then((response) => {
     console.log(response.data.success);
@@ -243,6 +301,7 @@ RequestWIthDraw = () =>{
       })
       // this.props.cart();
     }else{
+      alert('Your withdrawal request was successful.')
       alert(response.data.message)
     }
   })
@@ -255,8 +314,13 @@ RequestWIthDraw = () =>{
   });
 
 }
+_scrollToInput (reactNode: any) {
+  // Add a 'scroll' ref to your ScrollView
+  this.scroll.props.scrollToFocusedInput(reactNode)
+}
 
   render() {
+    // console.log(this.PickDate);
     let enable = this.state.screenHeight + 100 > hp('100%');
     const pickerValues = [
       {
@@ -377,17 +441,7 @@ RequestWIthDraw = () =>{
 
     return (
       <View style={styles.conatainer}>
-       {/* <MenuDrawer 
-          open={this.state.open} 
-          drawerContent={this.drawerContent()}
-          drawerPercentage={60}
-          animationTime={250}
-          overlay={true}
-          opacity={.9}
-        >
-        <View style={styles.topbarBox}>
-        <Topbar OpenSideDrawer={this.toggleOpen} style={{zIndex:9999}} title={'Open Challenges'}/>
-      </View> */}
+
 
         <View style={styles.view_photo_parent}>
           <View style={styles.view_photo}>
@@ -419,134 +473,40 @@ RequestWIthDraw = () =>{
                     withdraw from your accuont.
                   </Text>
                 </View>
-
-                {/* <View style={styles.country_city}>
-               
-                       
-             
-
-                  <View>
-                    <Modal
-                      visible={this.state.pickerDisplayed1}
-                      animationType={'slide'}
-                      transparent={true}>
-                      <View
-                        style={{
-                          padding: 20,
-                          backgroundColor: '#efefef',
-                          bottom: 20,
-                          left: 20,
-                          right: 20,
-                          alignItems: 'center',
-                          position: 'absolute',
-                        }}>
-                        <Text style={{fontSize:wp('5%')}}>Deposite</Text>
-                        {pickerValues.map((value, index) => {
-                          return (
-                            <TouchableOpacity
-                              key={index}
-                              onPress={() =>
-                                this.setPickerValue(
-                                  value.value,
-                                  this.props.balance.Desposit,
-                                )
-                              }
-                              style={{
-                                paddingTop: 4,
-                                paddingBottom: 4,
-                                width: '100%',
-                              }}>
-                              <View style={styles.communication1}>
-                                <Text style={{fontSize: wp('4%')}}>
-                                  {value.title}
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
-                          );
-                        })}
-
-                        <TouchableOpacity
-                          onPress={() => this.togglePicker1()}
-                          style={{paddingTop: 4, paddingBottom: 4}}>
-                          <Text style={{color: '#8cc63f',fontSize:wp('5%')}}>Done</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </Modal>
-                  </View>
-                  <View>
-                    <Modal
-                      visible={this.state.pickerDisplayed2}
-                      animationType={'slide'}
-                      transparent={true}>
-                      <View
-                        style={{
-                          padding: 20,
-                          backgroundColor: '#efefef',
-                          bottom: 20,
-                          left: 20,
-                          right: 20,
-                          alignItems: 'center',
-                          position: 'absolute',
-                        }}>
-                        <Text style={{fontSize:wp('5%')}}>Withdraw</Text>
-                        {pickerValues.map((value, index) => {
-                          return (
-                            <TouchableOpacity
-                              key={index}
-                              onPress={() =>
-                                this.setPickerValue(
-                                  value.value,
-                                  this.props.balance.WithDraw,
-                                )
-                              }
-                              style={{
-                                paddingTop: 4,
-                                paddingBottom: 4,
-                                width: '100%',
-                              }}>
-                              <View style={styles.communication1}>
-                                <Text style={{fontSize: wp('4%')}}>
-                                  {value.title}
-                                </Text>
-                              </View>
-                            </TouchableOpacity>
-                          );
-                        })}
-
-                        <TouchableOpacity
-                          onPress={() => this.togglePicker2()}
-                          style={{paddingTop: 4, paddingBottom: 4}}>
-                          <Text style={{color: '#8cc63f',fontSize:wp('5%')}}>Done</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </Modal>
-                  </View>
-                </View>  */}
               </View>
             </ImageBackground>
           </View>
         </View>
-        <View style={{flexDirection:'column', padding:15,}}>
+        <View style={{flexDirection:'column', paddingHorizontal:15,}}>
         <Text style={{alignContent:'flex-start',justifyContent:'flex-start',color:'#29abe2',fontWeight:'bold'}}>Deposit</Text>
         <View style={styles.view_drop}>
             
             <RNPickerSelect style={{}}
                     color="#8cc63f"
+                    placeholder={{
+                      label: 'Select Payment Methode',
+                      value: '',
+                      fontSize:wp('3%'),
+                      color: '#29ABE2',
+                    }}
                     onValueChange={(value)=>{
-                      if(value == 'Stripe'){
-                        this.setState({visible:true});
-                      }
-                      else if(value == 'Paypal'){
-                        this.setState({paypal:true});
-                      }
+                      //  if(value == 'Paypal'){
+                      //   this.PickDate.togglePicker();
+                      //   this.setState({
+                      //     PayVivaPaypall:true
+                      //   })
+                      // }
+                      this.setState({
+                        depositThrough:value
+                      })
                     }}
                     Icon={() => {
-                      return ( <View style={{justifyContent:'center',alignItems:'center'}}>
+                      return ( <View style={{justifyContent:'center',alignItems:'center',marginTop:Platform.OS ==='android'?wp('2.5%'):0}}>
                         <Arrow name="keyboard-arrow-down" size={wp('7%')} color="#999999" /></View>
                         );
                     }}
                       items={[
-                        { label: 'Paypal', value: 'Paypal',color:'#29abe2',},
+                        { label: 'Paypal', value: 'Paypal',color:'#000',},
                         { label: 'Stripe', value: 'Stripe',color:'#000', },
                         { label: '2CheckOut', value: '2CheckOut' ,color:'#000'},
                       ]
@@ -556,32 +516,87 @@ RequestWIthDraw = () =>{
                     />
 
             </View>
+            {this.state.depositThrough =='Paypal'?<View style={{
+        //  marginLeft:wp('4%'),
+        //  marginRight:wp('4%'),
+        width:'100%',
+        justifyContent:'center',
+        alignItems:'center',
+        alignContent:'center',
+        borderColor:'black',
+        borderWidth:2,
+       }}>
+       <TextInput 
+        placeholder={'Enter Amount'}
+        placeholderTextColor={'black'}
+        value={this.state.payableamount}
+       onChangeText={(text) =>{
+        let number = text.replace(/[^0-9]/g, '');
+        this.setState({
+          payableamount:number
+        })
+       }}
+        style={{
+          paddingLeft:wp('4%'),
+          width:'100%', 
+          height:wp('8%'),
+          fontSize:wp('3%')
+        
+        }}
+        />
+       </View>:<React.Fragment></React.Fragment>}
+            <TouchableOpacity 
+            onPress={() =>{
+              if(this.state.depositThrough =='Stripe'){
+                this.changeScreen('UrPicsPay.AddSubscriptionScreen','Stripe Payment')
+              }
+              if(this.state.depositThrough =='Paypal'){
+                let extraData= {
+                  payableamount:this.state.payableamount
+                }
+                this.changeScreen('UrPicsPay.depositThroughToPaypall','Paypal',extraData)
+              
+              }
+            }}
+            disabled={this.state.depositThrough == 'Paypal'?this.state.payableamount > 0?false:true:this.state.depositThrough?false:true } 
+            style={{
+              backgroundColor: this.state.depositThrough == 'Paypal'?this.state.payableamount > 0?'rgba(41, 171, 226, .8)':'gray':this.state.depositThrough?'rgba(41, 171, 226, .8)':'gray',
+              padding:wp('2%'),
+              justifyContent:'center',
+              alignContent:'center',
+              alignItems:'center',
+              marginTop:wp('2%')
+              }}>
+              <Text style={{color:'white',fontSize:wp('3.4%'),fontWeight:'bold'}}>
+                Deposit Through {this.state.depositThrough}
+              </Text>
+            </TouchableOpacity>
         </View>        
         <View style={{flexDirection:'column', padding:15,}}>
         <Text style={{alignContent:'flex-start',justifyContent:'flex-start',color:'#29abe2',fontWeight:'bold'}}>Withdraw</Text>
         <View style={styles.view_drop}>
             
             <RNPickerSelect style={{}}
+                  ref={ref=>(this.PickDate = ref)}
                     color="#8cc63f"
                     onValueChange={(value)=>{
-                      if(value == 'Stripe'){
-                        this.setState({visible:true});
-                      }
-                      else if(value == 'Paypal'){
-                        this.setState({paypal:true});
-                      }
+                     
+                      this.setState({
+                        paypal:true,
+                        Methode:value
+                      });
                     }}
                     Icon={() => {
-                      return ( <View style={{justifyContent:'center',alignItems:'center'}}>
+                      return ( <View style={{justifyContent:'center',alignItems:'center',marginTop:Platform.OS ==='android'?wp('2.5%'):0}}>
                         <Arrow name="keyboard-arrow-down" size={wp('7%')} color="#999999" /></View>
                         );
                     }}
                       items={[
-                        { label: 'Paypal', value: 'Paypal',color:'#29abe2',},
-                        { label: 'Stripe', value: 'Stripe',color:'#000', },
-                        { label: 'Payoneer', value: 'Payoneer' ,color:'#000'},
-                        { label: 'Google Pay', value: 'rating' ,color:'#000'},
-                        { label: '2CheckOut', value: 'rating' ,color:'#000'},
+                        { label: 'Paypal', value: 'paypal',color:'#29abe2',},
+                        { label: 'Stripe', value: 'stripe',color:'#000', },
+                        { label: 'Payoneer', value: 'payoneer' ,color:'#000'},
+                        { label: 'Google Pay', value: 'googlepay' ,color:'#000'},
+                        { label: '2CheckOut', value: '2CheckOut' ,color:'#000'},
                       ]
                       
                   }
@@ -600,27 +615,7 @@ RequestWIthDraw = () =>{
               <TouchableOpacity onPress={()=>this.ChangeWithDraw()} style={[styles.item_view,{backgroundColor:this.state.withdraw?'#8cc63f':'#B5B5B5'}]}>
                 <Text style={styles.text_view}>Withdrawl</Text>
               </TouchableOpacity>
-              {/* <View style={styles.view_line1}></View>
-              <TouchableOpacity onPress={()=>this.ChangeFlip()} style={[styles.item_view,{backgroundColor:this.state.flips?'#8cc63f':'#B5B5B5'}]}>
-                <Text style={styles.text_view}>Flips</Text>
-              </TouchableOpacity>
-              <View style={styles.view_line1}></View>
-              <TouchableOpacity onPress={()=>this.ChangeCharge()} style={[styles.item_view,{backgroundColor:this.state.charge?'#8cc63f':'#B5B5B5'}]}>
-                <Text style={styles.text_view}>Charge</Text>
-              </TouchableOpacity>
-              <View style={styles.view_line1}></View>
-              <TouchableOpacity onPress={()=>this.ChangeWand()} style={[styles.item_view,{backgroundColor:this.state.wand?'#8cc63f':'#B5B5B5'}]}>
-                <Text style={styles.text_view}>Wand</Text>
-              </TouchableOpacity>
-              <View style={styles.view_line1}></View>
-              <TouchableOpacity onPress={()=>this.ChangeBuySell()} style={[styles.item_view,{backgroundColor:this.state.buySell?'#8cc63f':'#B5B5B5'}]}>
-                <Text style={styles.text_view}>Buys</Text>
-              </TouchableOpacity>
-              <View style={styles.view_line1}></View>
-              <TouchableOpacity onPress={()=>this.ChangeJoin()} style={[styles.item_view,{backgroundColor:this.state.joins?'#8cc63f':'#B5B5B5'}]}>
-                <Text style={styles.text_view}>My Joins</Text>
-              </TouchableOpacity> */}
-              {/* <View style={styles.view_line1}></View> */}
+
             </View>
             
           </ScrollView>
@@ -767,6 +762,10 @@ RequestWIthDraw = () =>{
                 })}
           >
               <ModalContent style={styles.sec}>
+              <KeyboardAwareScrollView   innerRef={ref => {
+    this.scroll = ref
+  }}>
+                <ScrollView>
                   <View>
                   <View style={{alignContent:'flex-start',alignItems:'center'}}>
                       <Text style={styles.view_txtt}>Request Withdrawal</Text>
@@ -803,6 +802,10 @@ RequestWIthDraw = () =>{
                                   </View>
                                   <View style={styles.section_bodyy}>
                                       <TextInput 
+                                      //  onFocus={(event: Event) => {
+                                      //   // `bind` the function if you're using ES6 classes
+                                      //   this._scrollToInput(findNodeHandle(event.target))
+                                      // }}
                                       style={styles.txt_view1} 
                                       placeholder="90000"
                                       value={this.state.amount}
@@ -828,6 +831,10 @@ RequestWIthDraw = () =>{
                               </View>
                               <View style={styles.section_bodyq}>
                                   <TextInput 
+                                  //  onFocus={(event: Event) => {
+                                  //   // `bind` the function if you're using ES6 classes
+                                  //   this._scrollToInput(findNodeHandle(event.target))
+                                  // }}
                                   style={styles.txt_view11} 
                                   placeholder="Account Infomation"
                                   value={this.state.accountInfo}
@@ -843,6 +850,10 @@ RequestWIthDraw = () =>{
                               </View>
                               <View style={styles.section_bodyq}>
                                   <TextInput 
+                                  //  onFocus={(event: Event) => {
+                                  //   // `bind` the function if you're using ES6 classes
+                                  //   this._scrollToInput(findNodeHandle(event.target))
+                                  // }}
                                   style={styles.txt_view11} 
                                   value={this.state.Description}
                                   placeholder="Description"
@@ -879,11 +890,32 @@ RequestWIthDraw = () =>{
 
                   </View>
                   
-                          
+                  </ScrollView>
+                  </KeyboardAwareScrollView>
               </ModalContent>
           </Modal>
         </View>
-         
+
+
+                  <Modal
+              visible={this.state.PayVivaPaypall}
+              transparent={true}
+              style={{backgroundColor:'transparent'}}
+              onTouchOutside={() => {
+              this.setState({ PayVivaPaypall: false });
+              }}
+              modalAnimation={new SlideAnimation({
+                  slideFrom: 'bottom',
+                })} >
+              <ModalContent style={{width:wp('100%'),height:'100%'}} >
+              <WebView
+                    source={{uri:'https://urpixpays.com/stagging_urpixpays/paypal/10'}}
+                    onNavigationStateChange={data=> this.handleResponse(data)}
+                    // injectedJavaScript={'document.getElementById("price").value="'+AmountTotal+'";document.getElementById("taskId").value="'+this.props.taskId+'";document.getElementById("userId").value="'+this.props.user.id+'";'}
+                    // onNavigationStateChange={data=> this.handleResponse(data)}
+                      />
+              </ModalContent>
+          </Modal>
       </View>
     );
   }
